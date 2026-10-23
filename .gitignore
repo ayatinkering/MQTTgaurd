@@ -1,0 +1,6 @@
+# Local downloads and generated inspection artifacts
+data/
+reports/
+__pycache__/
+*.py[cod]
+.venv/

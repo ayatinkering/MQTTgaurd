@@ -1,0 +1,96 @@
+{
+  "dataset": "MQTTEEB-D: A Real-World IoT Cybersecurity Dataset for AI-Powered Threat Detection in MQTT Networks",
+  "version": 2,
+  "doi": "10.17632/jfttfjn6tr.2",
+  "source": "https://data.mendeley.com/datasets/jfttfjn6tr/2",
+  "license": {
+    "id": "01d9c749-3c4d-4431-9df3-620b2dcfe144",
+    "description": "You can share, copy and modify this dataset so long as you give appropriate credit, provide a link to the CC BY license, and indicate if changes were made, but you may not do so in a way that suggests the rights holder has endorsed you or your use of the dataset. Note that further permission may be required for any content within the dataset that is identified as belonging to a third party.",
+    "url": "http://creativecommons.org/licenses/by/4.0",
+    "category": "Creative",
+    "short_name": "CC BY 4.0",
+    "full_name": "Creative Commons Attribution 4.0 International"
+  },
+  "files": [
+    {
+      "filename": "categorical_processing_metadata.json",
+      "publisher_filename": "categorical_processing_metadata.json",
+      "id": "572d9ad3-c17c-4383-8d61-9d863ec46717",
+      "sha256": "46885c052e6b4adb4359eb19e31c69d0b1b044bfb25f45cba16dc917ed01698d",
+      "bytes": 3869,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/572d9ad3-c17c-4383-8d61-9d863ec46717/file_downloaded"
+    },
+    {
+      "filename": "label_encoding_metadata.json",
+      "publisher_filename": "label_encoding_metadata.json",
+      "id": "51b86f4f-7568-4a66-9de6-db536752bfff",
+      "sha256": "f35cae3f6aec24b6782faca4e62683796f00b959e70bc1282e741953e93e558c",
+      "bytes": 119,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/51b86f4f-7568-4a66-9de6-db536752bfff/file_downloaded"
+    },
+    {
+      "filename": "MQTTEEB-D_cleaned_data.csv",
+      "publisher_filename": "MQTTEEB-D_cleaned_data.csv",
+      "id": "1aa86309-e095-44ff-84b6-657b233bc33a",
+      "sha256": "0eae03bc89214766142f23e1de2a6c1d69902ad625c016cf0c5f8b7e51e9c9c8",
+      "bytes": 17246467,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/1aa86309-e095-44ff-84b6-657b233bc33a/file_downloaded"
+    },
+    {
+      "filename": "MQTTEEB-D_dataset_loop_1.csv",
+      "publisher_filename": "MQTTEEB-D_dataset_loop_1.csv",
+      "id": "fa73f00e-5ef6-4f08-a3b7-f54d61603101",
+      "sha256": "2242eee9149e902d0726ec4aaea6637e304356ad9c2c8a8f99c470080f818709",
+      "bytes": 10485830,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/fa73f00e-5ef6-4f08-a3b7-f54d61603101/file_downloaded"
+    },
+    {
+      "filename": "MQTTEEB-D_dataset_loop_2.csv",
+      "publisher_filename": "MQTTEEB-D_dataset_loop_2.csv",
+      "id": "5b28cdba-5be5-4fdc-b5d4-44b98ea4b8aa",
+      "sha256": "b565e0798f865986f1d71c3c7ce1063a463cfd3d3c3d75767a896012d317307f",
+      "bytes": 3246491,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/5b28cdba-5be5-4fdc-b5d4-44b98ea4b8aa/file_downloaded"
+    },
+    {
+      "filename": "MQTTEEB-D_dataset_loop_3.csv",
+      "publisher_filename": "MQTTEEB-D_dataset_loop_3.csv",
+      "id": "71304fb1-9d91-4603-8e81-a888514ac16f",
+      "sha256": "01ed23afd4d7e59d7daa9d668458569e3597a0cefdcda186a36aa1a753092ba8",
+      "bytes": 1644474,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/71304fb1-9d91-4603-8e81-a888514ac16f/file_downloaded"
+    },
+    {
+      "filename": "MQTTEEB-D_dataset_loop_4.csv",
+      "publisher_filename": "MQTTEEB-D_dataset_loop_4.csv",
+      "id": "97400519-1228-45fb-a65d-f99f19847fa5",
+      "sha256": "24dc0359580319d56e623535df849ff4e5d67d65c2bff1e200089b4f4c4ce744",
+      "bytes": 1647341,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/97400519-1228-45fb-a65d-f99f19847fa5/file_downloaded"
+    },
+    {
+      "filename": "README_ffe6aee1-41fc-4fd3-8625-5a04e79aae52.txt",
+      "publisher_filename": "README.txt",
+      "id": "ffe6aee1-41fc-4fd3-8625-5a04e79aae52",
+      "sha256": "8f08d566d4f1ef47d1e8c94655a05f89ca95cb87fba84b87caa195bbf0dc1bb9",
+      "bytes": 1056,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/ffe6aee1-41fc-4fd3-8625-5a04e79aae52/file_downloaded"
+    },
+    {
+      "filename": "README_d653af55-6000-4493-910f-c2c88d57207e.txt",
+      "publisher_filename": "README.txt",
+      "id": "d653af55-6000-4493-910f-c2c88d57207e",
+      "sha256": "c953a159d8220f2cb90b43094bc6e7e7867b38666a23bb9de7a130eec73b9cc7",
+      "bytes": 541,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/d653af55-6000-4493-910f-c2c88d57207e/file_downloaded"
+    },
+    {
+      "filename": "README_9bffc97f-c617-4bd1-90db-a1a32b224118.txt",
+      "publisher_filename": "README.txt",
+      "id": "9bffc97f-c617-4bd1-90db-a1a32b224118",
+      "sha256": "50cd6b4f06609f7f0d71876b71869727110a2fadcb691051bbc0df9b092d86e5",
+      "bytes": 1957,
+      "url": "https://data.mendeley.com/public-files/datasets/jfttfjn6tr/files/9bffc97f-c617-4bd1-90db-a1a32b224118/file_downloaded"
+    }
+  ]
+}

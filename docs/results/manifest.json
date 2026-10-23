@@ -1,0 +1,112 @@
+{
+  "dataset_sha256": {
+    "1": "2242eee9149e902d0726ec4aaea6637e304356ad9c2c8a8f99c470080f818709",
+    "2": "b565e0798f865986f1d71c3c7ce1063a463cfd3d3c3d75767a896012d317307f",
+    "3": "01ed23afd4d7e59d7daa9d668458569e3597a0cefdcda186a36aa1a753092ba8",
+    "4": "24dc0359580319d56e623535df849ff4e5d67d65c2bff1e200089b4f4c4ce744"
+  },
+  "features": [
+    "count",
+    "mean_tcp_len",
+    "mean_interarrival_s",
+    "mean_mqtt_kalive"
+  ],
+  "window_s": 2,
+  "seed": 42,
+  "split": {
+    "train": [
+      1,
+      2
+    ],
+    "validation": 3,
+    "test": 4
+  },
+  "parameters": {
+    "bootstrap": true,
+    "ccp_alpha": 0.0,
+    "class_weight": "balanced",
+    "criterion": "gini",
+    "max_depth": 3,
+    "max_features": "sqrt",
+    "max_leaf_nodes": null,
+    "max_samples": null,
+    "min_impurity_decrease": 0.0,
+    "min_samples_leaf": 2,
+    "min_samples_split": 2,
+    "min_weight_fraction_leaf": 0.0,
+    "monotonic_cst": null,
+    "n_estimators": 16,
+    "n_jobs": 1,
+    "oob_score": false,
+    "random_state": 42,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "imputation": [
+    1.0,
+    616.0,
+    0.498978,
+    0.0
+  ],
+  "candidates": [
+    {
+      "f1": 0.8695652173913043,
+      "nodes": 114,
+      "trees": 8,
+      "depth": 3
+    },
+    {
+      "f1": 0.5365853658536586,
+      "nodes": 370,
+      "trees": 8,
+      "depth": 5
+    },
+    {
+      "f1": 0.8843537414965986,
+      "nodes": 230,
+      "trees": 16,
+      "depth": 3
+    },
+    {
+      "f1": 0.5356521739130434,
+      "nodes": 742,
+      "trees": 16,
+      "depth": 5
+    }
+  ],
+  "rate_baseline": {
+    "threshold": 2.0,
+    "direction": 1,
+    "validation_f1": 0.7801418439716312
+  },
+  "export_parity": {
+    "inputs": 11210,
+    "threshold_boundary_inputs": 321,
+    "label_disagreements": 0,
+    "max_probability_error": 0.0
+  },
+  "python": "3.12.14",
+  "sklearn": "1.9.1",
+  "clips": [
+    {
+      "name": "BENIGN TRACE",
+      "capture": 3,
+      "start_window": 0,
+      "count": 18
+    },
+    {
+      "name": "SLOWITE TRACE",
+      "capture": 3,
+      "start_window": 712,
+      "count": 18
+    },
+    {
+      "name": "GAP TRACE",
+      "capture": 3,
+      "start_window": 0,
+      "count": 18
+    }
+  ],
+  "batch_inference_us_per_valid_window": 0.7195624978824829,
+  "timing_note": "Laptop batch timing, not physical ESP32 inference."
+}

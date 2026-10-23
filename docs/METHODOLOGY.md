@@ -1,162 +1,219 @@
-# MQTTGuard Methodology
+# MQTTGuard: Step-by-Step Experimental Methodology
 
-## Basis and Research Hypothesis
+## 1. What We Are Testing
 
-This document translates the team's current report into an implementation protocol. The report specifies MQTTEEB-D, Legitimate/SlowITe filtering, 2-second windows, four compact features, Random Forest classification, and consecutive-window confirmation for k in {1, 2, 3}.
+The detector first classifies a traffic window using a Random Forest, then optionally waits for repeated positive predictions before confirming an attack. We ask whether that extra wait reduces false alarms enough to justify the delay and any missed attacks.
 
-The hypothesis is that sustained slow attacks offer repeated evidence that can improve alert reliability. Reduced false alerts, retained episode recall, bounded delay, and low processing overhead are objectives to evaluate, not established results.
+**Fixed primary configuration:** 2-second, non-overlapping windows; four features; Random Forest; k = 1, 2, and 3. The same trained model and held-out predictions serve all k values.
 
-Policies for missing data, splitting, transition windows, and event counting below are explicit implementation decisions where the report leaves details open.
+The report supplies this core proposal. This protocol adds explicit rules where the report was incomplete and incorporates the actual downloaded data. No model performance has been measured yet.
 
-## 1. Acquire and Validate Data
+## 2. Acquire the Correct Files
 
-Use the public MQTTEEB-D data identified by report reference [14]. Before training, verify the actual download location and license, record the version and file checksums, and inspect the schema.
+Official release: https://data.mendeley.com/datasets/jfttfjn6tr/2
 
-The report describes approximately 222,813 observations across six classes and selects 17,557 Legitimate plus 20,090 SlowITe observations. Treat these counts as expectations to check, not constants to enforce by dropping records.
+Run from the repository root:
 
-Required inputs are timestamps, TCP length, MQTT keep-alive, and ground-truth labels. Confirm timestamp units, numeric field meanings, missing-value conventions, and capture/session identity from the source. A dataset row is called an observation unless packet-level semantics are verified.
-
-Retain original timestamps and source identifiers. Establish continuity boundaries before class filtering: removing other attack classes must not join otherwise separated benign and SlowITe regions. Check chronological order within each capture and use stable ordering for tied timestamps. Do not remove equal timestamps or duplicate-looking rows without evidence that they are acquisition duplicates.
-
-## 2. Define Episodes and Data Partitions
-
-An attack episode is a contiguous SlowITe region within a source capture, respecting timestamp discontinuities and any supplied attack/session metadata. Define the discontinuity rule from the capture format and document it before evaluation. Verify that row-label runs correspond to meaningful attack episodes; a single sorted table does not by itself establish independent attack repetitions.
-
-Prefer held-out captures when independent captures exist. Otherwise use chronological training, validation, and test blocks with published boundaries. Keep whole episodes within partitions, fit all learned preprocessing on training data, tune only on validation data, and reserve the test set for the final comparison. Reset persistence at every partition boundary.
-
-Do not fabricate independent episodes or use random window shuffling to imply temporal generalization. If available data cannot support partitions containing both suitable benign periods and attack episodes, report that limitation before drawing performance conclusions.
-
-## 3. Construct Windows
-
-Use fixed, non-overlapping half-open intervals:
-
-```text
-Tw = 2 seconds
-Wj = [t0 + j*Tw, t0 + (j+1)*Tw)
+```bash
+python3 scripts/download_dataset.py
+python3 scripts/inspect_dataset.py
+python3 -m unittest discover -s scripts -p 'test_*.py' -v
 ```
 
-Choose t0 once per capture from its first valid timestamp and record it. A boundary observation belongs to the window beginning at that boundary. Keep window IDs, start/end times, source identity, observation count, and label composition.
+These scripts require Python 3.10+ and `curl`, with no Python package installation. The downloader requires network access; inspection works offline after download. The downloader reviews only publisher version 2 and stops if the current version changes.
 
-Window policies:
+The inspector writes `reports/dataset_audit.json`, `reports/dataset_preview.html`, and per-file nonempty-window CSVs. Its bins are exploratory: they include each capture's trailing incomplete window and do not constitute a trained detector or final experimental cohort.
 
-- **Pure Legitimate:** label 0 for classifier development and evaluation.
-- **Pure SlowITe:** label 1 for classifier development and evaluation.
-- **Mixed transition:** exclude from classifier fitting and pure-window classification metrics, following the report. Retain in operational replay, score from traffic features, and assess alerts against the original episode timeline.
-- **Empty or unscorable:** retain its position on the timeline, mark unavailable, and reset persistence. Do not compact time by removing it.
-- **Other-class or capture boundary:** break continuity and reset persistence.
-- **Trailing incomplete window:** omit from primary inference, log it, and retain any affected ground-truth episode in the operational denominator so omission cannot inflate recall.
+The primary modelling inputs are the four original `MQTTEEB-D_dataset_loop_*.csv` files. The cleaned CSV serves as a cross-check because the audit found the same rows in the combined raw files. Do not train on both copies. Do not use publisher SMOTE, normalized, or standardized versions for chronological replay.
 
-Operational replay runs after acquisition/splitting policies are fixed and never uses ground-truth class purity to decide whether a nonempty eligible window produces an inference.
+Preserve the original files. Record SHA-256 hashes, release version, license, and retrieval date. The compact manifest and [dataset review](DATASET_REVIEW.md) provide traceability. Attribution must cite the dataset creators and the associated Data in Brief article, not only a later benchmark study.
 
-## 4. Extract Features
+## 3. Validate Before Modelling
 
-For N observations in a window:
+The downloaded files use `label`, not the `target` field described in part of the paper. Original string labels include `legitimate` and `slowite`.
 
-| Feature | Definition |
-| --- | --- |
-| Observation count | N |
-| Mean TCP length | Arithmetic mean of valid `tcp_len` values |
-| Mean inter-arrival time | Sum of consecutive timestamp differences divided by N - 1, for N >= 2 |
-| Mean MQTT keep-alive | Arithmetic mean of valid `mqtt_kalive` values |
+For this binary task, map `legitimate` to 0 and `slowite` to 1 **only for training targets and evaluation**. The publisher's metadata uses legitimate = 3 and slowite = 5 in encoded variants; that multiclass mapping is not the binary mapping.
 
-For N = 1, inter-arrival time is undefined and represented as missing. Preserve source-defined zeros where they are meaningful. Invalid numeric values become missing and are counted in the validation log. For nonempty windows, impute missing feature values using training-set medians; save those medians with the model. If a required feature has no valid training values, stop with a clear validation error rather than inventing a value.
+Audit outcomes to account for:
 
-The feature vector is `[count, mean_tcp_length, mean_interarrival, mean_keepalive]`. Labels, episode IDs, source row indices, and absolute timestamps are not predictor features. Scaling is not required for the proposed Random Forest pipeline.
+- 246 rows have missing labels. Keep them visible; never label them normal by default.
+- All timestamps parse as Unix seconds and are non-decreasing in source order. Preserve equal timestamps; they can represent different observations.
+- `tcp_time_delta` equals the absolute timestamp in every row. Exclude that field and calculate time differences yourself.
+- No exact duplicate rows were found. Do not remove observations merely because their timestamps coincide.
+- Labels identify observations. The files do not provide source/destination IPs, client IDs, or separate attack start/stop logs in their 13-column schema. Initial analysis is at capture level, not per-device attribution.
 
-## 5. Train the Classifier
+Preserve capture and row identifiers for auditing; never use them as predictive features. Source timezone is not supplied in the files: render epoch timestamps in UTC and label them as UTC.
 
-Train a scikit-learn Random Forest on pure training windows. Save feature order, imputation parameters, random seed, hyperparameters, class mapping, partition manifest, and dependency versions.
+## 4. Freeze the Data Split
 
-Use a single fixed model and decision rule to generate held-out binary predictions. Any tuning or probability-threshold choice uses validation data only. Do not retune the classifier separately for each persistence setting.
+Use whole captures rather than a random shuffle of nearby windows:
 
-## 6. Apply Persistence
+| Role | Capture files | Legitimate rows | SlowITe rows |
+| --- | --- | ---: | ---: |
+| Training | Loops 1 and 2 | 14,366 | 16,428 |
+| Validation | Loop 3 | 2,815 | 1,801 |
+| Primary test | Loop 4 | 376 | 1,861 |
 
-For prediction y_hat[t] in {0, 1}, confirm an attack only when the previous k consecutive eligible windows, including the current window, are suspicious:
+This split is selected before fitting any model. Fit imputation and model parameters on training data only. Choose any hyperparameters or probability threshold using validation data only. Keep the primary test unchanged and report it even if the result is poor.
 
-```text
-confirmed[t, k] = AND(y_hat[t-j] for j in 0..k-1)
-k = 1: immediate Random Forest baseline
-k = 2: proposed MQTTGuard configuration
-k = 3: strict persistence comparison
-```
+Capture 4's benign windows are unusually sparse. Add an explicitly separate leave-one-capture-out robustness study: each fold holds out one capture for testing, uses a predetermined different capture for validation, and trains on the remaining two. Freeze all fold assignments before tuning and publish each result; do not replace an inconvenient primary result with a favourable fold.
 
-Equivalent state update:
+All four captures are from one day and one testbed. State that restriction on generalization.
+
+## 5. Create Windows Without Losing Time
+
+For each capture, take the first valid timestamp as `t0`. Use integer microseconds so a timestamp exactly on a boundary is assigned consistently.
 
 ```text
-on boundary, missing interval, or unscorable window:
-    streak = 0
-    confirmed = false
-on a valid prediction:
-    streak = min(streak + 1, k) if prediction == 1 else 0
-    confirmed = (streak >= k)
+window j = [t0 + j * 2 seconds, t0 + (j + 1) * 2 seconds)
 ```
 
-An alert event starts when confirmation changes from false to true. Continued confirmation is one event with an ongoing status, not a new event every window. A negative prediction or continuity break ends that event.
+Keep one grid across the original capture. Do not select only target-class rows and then concatenate or re-index them. That would distort clock time and could make separated observations appear consecutive.
 
-This layer uses constant additional state for a fixed k. Total system cost still includes aggregation, feature extraction, preprocessing, and Random Forest inference and must be measured.
+For every window, save its capture ID, index, start/end times, observation count, feature values, and separate label composition. Missing label rows remain observations and contribute traffic features; their uncertainty affects scoring rather than changing runtime behaviour.
 
-## 7. Evaluate Classification and Alerts
+### Window handling
 
-### Classification
+| Situation | Prediction behaviour | Ground-truth use |
+| --- | --- | --- |
+| Nonempty, valid features | Predict at window end, without reading labels. | Use label composition only for fitting/scoring rules below. |
+| Empty interval | No inference; reset confirmation. | Record unavailable exposure. Never silently remove the interval. |
+| Invalid required inputs | Mark unscorable and reset. | Record reason and exposure lost. |
+| New capture/replay | Reset all temporal state. | Prevent evidence crossing partitions. |
+| Last incomplete interval | Omit from primary inference. | Retain affected episode proxies in recall denominators. |
 
-On pure held-out windows, report TP, FP, TN, FN, precision, recall, F1-score, and FPR:
+An empty two-second interval is common in this dataset and is not automatically a sensor failure. The reset is a chosen conservative confirmation policy; its effect must be measured.
+
+## 6. Extract the Four Features
+
+Use observations inside the current window only:
+
+| Feature | Calculation | Interpretation |
+| --- | --- | --- |
+| Count | Number of observations, N | Traffic intensity over a fixed period |
+| Mean TCP length | Mean of valid `tcp_len` values | Typical recorded TCP segment length |
+| Mean inter-arrival time | Mean of differences between consecutive in-window timestamps | Spacing of observed traffic |
+| Mean MQTT keep-alive | Mean of recorded `mqtt_kalive` values | Dataset's recorded keep-alive pattern |
+
+For N >= 2, mean inter-arrival time is `(last_timestamp - first_timestamp) / (N - 1)`. For N = 1, it is missing. Do not divide by zero or invent an observed gap.
+
+Fit a median imputer on training windows and save its values. A feature with no valid training measurements must trigger an explicit design review instead of being silently invented. Keep source zeros in `mqtt_kalive`; the file does not establish that a zero on every non-CONNECT observation is a negotiated client keep-alive of zero.
+
+The primary feature set remains four values. A missingness-indicator extension may be evaluated as a separately labelled ablation. Random Forest does not require feature normalization for this experiment.
+
+Do not feed absolute timestamps, `tcp_time_delta`, labels, row numbers, capture IDs, or episode proxies into the model.
+
+## 7. Define Training and Classification Cohorts
+
+Fit the binary classifier using windows containing exclusively Legitimate or exclusively SlowITe labelled observations. Exclude mixed-class and unknown-label windows from fitting and pure-window classification metrics. Log exclusions by capture and reason.
+
+Mixed Legitimate/SlowITe transition windows still receive predictions during full-capture replay, using all their traffic observations. Their labels do not enter runtime state. Other attack types and unknown labels are outside the primary binary scoring domain, but are not secretly removed to improve model behaviour.
+
+This distinction matters: **training labels choose fitting examples; replay labels measure results. Neither controls the deployed decision path.**
+
+## 8. Train the Model and Baselines
+
+Train a fixed-seed Random Forest with a small, documented validation search over tree count and depth. Save the feature order, imputer, class mapping, parameters, seed, software versions, and model artifact.
+
+Before interpreting the AI result, compare against a simple count/rate threshold, fitted and selected on training/validation data under the same split. That asks whether AI adds value beyond traffic intensity in this dataset. Apply the same k comparisons to this baseline where feasible.
+
+Export exactly one held-out prediction sequence per model. Every persistence setting consumes that saved sequence. Do not independently tune the RF for k = 2 to make its comparison favourable.
+
+## 9. Confirm Suspicion Across Consecutive Windows
+
+```text
+At replay/capture start: streak = 0
+
+For each complete two-second interval:
+    if empty or unscorable:
+        streak = 0
+        confirmed = false
+    else:
+        prediction = model(current_window_features)
+        streak = min(streak + 1, k) if prediction == 1 else 0
+        confirmed = (streak >= k)
+
+Start an alert event when confirmed changes from false to true.
+```
+
+- k = 1: immediate Random Forest baseline.
+- k = 2: proposed MQTTGuard confirmation.
+- k = 3: stricter comparison.
+
+Example: `positive, empty, positive` cannot confirm k = 2. `positive, positive` can. A long confirmed sequence is one event, with a duration, rather than a separate alert every interval.
+
+**Do not reset the streak because a ground-truth label is another attack or unknown.** A live detector does not know those labels. Offline evaluation can mark outputs outside the binary scoring domain without altering the detection state.
+
+The confirmation layer needs only a bounded counter and prior confirmation flag. This does not establish that the entire Random Forest pipeline is lightweight on embedded hardware.
+
+## 10. Define Episode Proxies Carefully
+
+The audit found 132 contiguous SlowITe label runs across the four files: 84, 24, 12, and 12. These are **observed label-run proxies**, not independently confirmed attack executions.
+
+For the primary proxy definition, each contiguous run of SlowITe-labelled observations within a capture starts at its first timestamp and ends at its last timestamp. Do not bridge over another label or capture boundary. Record internal gaps and run durations. Without controller logs, no algorithm can recover exact physical attack start/stop times from labels alone.
+
+Use these names in outputs: `label_run_recall` and `label_run_detection_latency`. Call them actual attack-episode metrics only when external timing metadata validates the boundaries.
+
+A confirmed event detects a proxy if the event starts inside that proxy's observed interval. For k > 1, require its contributing windows to be attributable to that proxy (no observations labelled as another attack or unknown in the confirming sequence); report any ambiguous confirmation separately. This is an evaluation attribution rule and never changes the prediction stream.
+
+An alert already active before a proxy begins does not create a fresh detection. A first confirmation after the final SlowITe timestamp is a late confirmation, not an on-time detection. Report late cases separately because last-packet time may precede the actual attack stop time.
+
+## 11. Measure the Outcomes
+
+### Classifier metrics on pure held-out windows
+
+Report TP, FP, TN, FN, precision, recall, F1, and FPR. These describe the RF predictions and do not change with k.
 
 ```text
 precision = TP / (TP + FP)
 recall    = TP / (TP + FN)
-F1        = 2*TP / (2*TP + FP + FN)
+F1        = 2TP / (2TP + FP + FN)
 FPR       = FP / (FP + TN)
 ```
 
-Report undefined metrics explicitly when their denominator is zero. Classification metrics describe the underlying model and remain the same across k settings.
+Use undefined/NA when a denominator is zero. Report counts alongside percentages.
 
-### Operational Detection
+### Confirmation metrics
 
-Use full chronological held-out replay and original ground-truth episode times. An alert event is attributed to an episode if its start occurs within that episode. An episode is detected if at least one event starts during it; an already-active event that began outside the episode does not establish a new detection. This makes onset-based attribution explicit and avoids crediting a preceding false alarm as attack detection.
+- **False alert events:** confirmed-event starts whose complete k-window evidence consists of pure Legitimate windows. This is a clean benign-window measure; it does not measure every possible false alarm during unknown or mixed traffic.
+- **Benign confirmed windows:** pure Legitimate windows with confirmation active, reported separately from new event starts. Flag events that started outside benign traffic.
+- **Proxy recall:** detected SlowITe label runs / all held-out SlowITe label runs, including misses caused by short duration or unavailable windows.
+- **Missed and late proxies:** identifiers, duration, window availability, and first confirmation if any.
+- **Latency:** first attributed event time minus proxy start, for detected proxies. Report mean, median, distribution, and misses separately.
+- **Coverage:** valid benign and SlowITe windows, mixed/unknown/out-of-scope windows, empty time, incomplete time, and capture duration.
+- **False events per eligible benign hour:** use the summed duration of pure-benign complete windows as denominator and label it explicitly. It is not the full benign wall-clock exposure.
 
-For dataset timestamps without attack-stop metadata, use the last recorded SlowITe timestamp as the episode end, disclose this approximation, and separately count confirmations occurring after that boundary. Do not silently extend episodes to accommodate delayed alerts.
+Emit predictions at the **end** of a complete window. State whether measured computation delay is added. Do not assign an alert the start time of the window that produced it. k = 2 does not guarantee a fixed four-second latency from physical attack onset.
 
-Report:
+## 12. Check Whether the Apparent Gain Is an Artifact
 
-- False alert events: starts in eligible benign time outside attack episodes.
-- Confirmed-positive benign windows: a separate measure of false-confirmation duration.
-- Attack-episode recall: detected episodes divided by all held-out attack episodes, including those missed due to short duration or unavailable windows.
-- Missed episodes: identifiers, durations, and relevant boundary conditions.
-- Detection latency for detected episodes: first attributed alert time minus episode onset, with mean, median, and spread. Report misses separately; do not assign them zero latency.
-- Exposure: evaluated benign duration, attack duration, episode count, and excluded/unavailable intervals. Normalize false events per benign hour when meaningful.
+Capture 4 has no adjacent pure-benign 2-second windows under the inspected alignment. Under the clean benign-event definition, k >= 2 cannot produce a false event there, regardless of model quality. Reporting that zero alone as a powerful AI improvement would be misleading.
 
-A complete-window prediction becomes available at the window's **end**, not its beginning. Use the end timestamp for replay alert time, state whether measured computation time is added, and never backdate detection to window start. An alert after episode end counts as a late confirmation rather than an on-time detection under the primary definition.
+Required diagnostics:
 
-Two-window confirmation does not guarantee an exact 4-second latency from attack onset. Alignment, mixed windows, model errors, and missing observations affect delay.
+1. Show adjacent benign-window opportunities and empty-window frequency for each capture.
+2. Run a clearly labelled ideal-label diagnostic: use perfect pure-window labels as predictions, retain gaps, and measure the maximum proxy coverage allowed by windowing and persistence. Mixed/unknown windows remain uncertain in this diagnostic. It is not trained-model performance.
+3. Compare with the rate/count baseline and inspect which feature drives separation.
+4. Evaluate 1-, 2-, and 5-second windows as a development sensitivity analysis. Keep 2 seconds as the primary report configuration; freeze alternative settings before final tests.
+5. Report every held-out capture separately and explain loop 4's sparse benign traffic.
+6. Preserve zero-effect results: if k = 1 already produces no false alerts, k = 2 cannot demonstrate a further reduction on that test.
 
-## 8. Measure Cost and Export Evidence
+## 13. Runtime and Reproducibility
 
-Measure feature-processing, inference, and persistence time with a monotonic clock, and identify which stages each timing includes. Separate model training time from replay processing time. Record hardware, operating system, software versions, feature/model size, and Random Forest configuration. Report typical and tail processing times and compare them with the 2-second interval. Offline speed alone does not prove real-time hardware performance.
+Measure window feature processing, imputation/inference, and confirmation using a monotonic clock. Separate training time from replay processing. Report typical and tail times, hardware, model size, and dependency versions. Compare processing time with the window duration. A fast laptop run is not proof of Raspberry Pi suitability.
 
-Save input/split manifests, configuration, validation logs, model artifact, window features, predictions, confirmation timelines, alert events, episode outcomes, metric tables, and comparison plots. All k settings must derive from the same held-out predictions.
+Save a run manifest, split assignment, fitted preprocessing, model, windows, predictions, confirmation states, event starts/ends, proxy outcomes, metric tables, and failure-case plots. Record exclusions and boundary policies. Relevant tests must cover exact boundary assignment, empty resets, capture resets, mixed-window handling, singleton features, event counting, and latency.
 
-## 9. Interpretation and Future Work
+## 14. How to Present the Result
 
-Report whether false alerts decrease and what happens to episode recall and latency. Correlated false predictions can survive persistence; short attacks can be missed; dataset-specific performance may not generalize. Do not claim overall novelty from this comparison alone or infer gateway resource suitability without measurements.
+Use a final table with one row per model/k/capture and columns for false events, eligible benign exposure, proxy recall, misses, late confirmations, median/mean delay, and processing time. Include a timeline explaining at least one successful detection and one failure.
 
-Future work from the report includes adaptive windows, two-of-three confirmation, multiclass detection, live MQTT processing, Raspberry Pi deployment, resource profiling, and automated response.
+The defensible contribution is an empirical evaluation of lightweight temporal confirmation for this dataset and threat setting. Consecutive confirmation is not itself a new general algorithm. Actual effectiveness, embedded suitability, and broader novelty must be supported by experiments and literature rather than asserted.
 
-## Report References
+## 15. Sources
 
-The entries below are transcribed from the report for traceability. Their publication details, DOI/title correspondence, and dataset access links have **not been independently verified**. Incomplete entries require bibliographic completion before submission or publication.
-
-1. M. Al-Fayoumi and Q. Abu Al-Haija, “Capturing low-rate DDoS attack based on MQTT protocol in software Defined-IoT environment,” *Array*, vol. 19, Art. 100316, 2023. DOI: 10.1016/j.array.2023.100316.
-2. A. Gavric, S. Bhandari, and A. Shalaginov, “Towards resource-efficient DDoS detection in IoT: Leveraging feature engineering of system and network usage metrics,” *Journal of Network and Systems Management*, vol. 32, 2024. DOI: 10.1007/s10922-024-09848-2.
-3. I. H. Putro, T. Ahmad, and R. M. Ijtihadie, “Enhancing MQTT intrusion detection in IoT using machine learning and feature engineering,” *IEEE Open Journal of the Communications Society*, vol. 6, pp. 7855–7884, 2025. DOI: 10.1109/OJCOMS.2025.3610132.
-4. T. Puccetti and A. Ceccarelli, “On detection latencies of network intrusion detectors—discussion and application,” *Empirical Software Engineering*, 2026. DOI: 10.1007/s10664-025-10766-3.
-5. A. Alatram, L. F. Sikos, M. Johnstone, P. Szewczyk, and J. J. Kang, “DoS/DDoS-MQTT-IoT: A dataset for evaluating intrusions in IoT networks using the MQTT protocol,” *Computer Networks*, vol. 231, Art. 109809, 2023. DOI: 10.1016/j.comnet.2023.109809.
-6. H. Hindy, E. Bayne, M. Bures, R. Atkinson, C. Tachtatzis, and X. Bellekens, “Machine learning based IoT intrusion detection system: An MQTT case study (MQTT-IoT-IDS2020 dataset),” 2021. Publication details incomplete in report.
-7. M. A. Khan et al., “A deep learning-based intrusion detection system for MQTT enabled IoT,” *Sensors*, vol. 21, no. 21, Art. 7016, 2021. DOI: 10.3390/s21217016.
-8. F. Valeur, G. Vigna, C. Kruegel, and R. A. Kemmerer, “A comprehensive approach to intrusion detection alert correlation,” *IEEE Transactions on Dependable and Secure Computing*, 2004. Volume, issue, pages, and DOI absent from report.
-9. C. Udurume et al., “Intrusion detection techniques for MQTT-enabled IoT networks,” in *Proc. International Conference on Information and Communication Technology Convergence (ICTC)*, 2024. DOI: 10.1109/ICTC62082.2024.10826657.
-10. R. Alaiz-Moreton et al., “Multiclass classification procedure for detecting attacks on MQTT protocol in Internet of Things,” 2019. DOI: 10.1155/2019/6516253. Venue details incomplete in report.
-11. M. A. Ahmadon et al., “Process-based intrusion detection method for IoT systems using MQTT protocol,” in *Proc. IEEE Global Conference on Consumer Electronics (GCCE)*, 2019. DOI: 10.1109/GCCE46687.2019.9015331.
-12. A. P. Haripriya and K. Kulothungan, “Secure-MQTT: An efficient fuzzy logic-based approach to detect DoS attack in MQTT protocol for Internet of Things,” *EURASIP Journal on Wireless Communications and Networking*, 2019. DOI: 10.1186/s13638-019-1402-8.
-13. S. A. Mirheidari, S. Arshad, and R. Jalili, “Alert correlation algorithms: A survey and taxonomy,” 2018. Publication details incomplete in report.
-14. H. Allaga et al., “MQTTEEB-D: Realistic MQTT anomaly detection for IoT environments,” *Ad Hoc Networks*, 2026. DOI: 10.1016/j.adhoc.2025.104062.
-15. A. Alharbi and M. Ahmed, “Machine-learning-based intrusion detection in realistic IoT networks,” 2026. Publication details incomplete in report.
+- Official dataset and license: https://data.mendeley.com/datasets/jfttfjn6tr/2
+- A. Aqachtoul et al., *MQTTEEB-D: A Real-World IoT Cybersecurity Dataset for AI-Powered Threat Detection in MQTT Networks*, Data in Brief, 2025: https://doi.org/10.1016/j.dib.2025.111897
+- Dataset creators' associated application study, listed in the release README: https://doi.org/10.1038/s41598-025-28516-2
+- Detection-latency evaluation background: https://doi.org/10.1007/s10664-025-10766-3
+- Original project-report bibliography, preserved with verification notes: [REPORT_REFERENCES.md](REPORT_REFERENCES.md).

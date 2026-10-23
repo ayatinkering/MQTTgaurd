@@ -1,0 +1,427 @@
+[
+  {
+    "capture": 4,
+    "model": "RF",
+    "k": 1,
+    "classification": {
+      "confusion_matrix": [
+        [
+          372,
+          0
+        ],
+        [
+          55,
+          143
+        ]
+      ],
+      "precision": 1.0,
+      "recall": 0.7222222222222222,
+      "f1": 0.8387096774193549,
+      "fpr": 0.0
+    },
+    "false_events": 0,
+    "benign_confirmed_windows": 0,
+    "benign_hours": 0.20666666666666667,
+    "false_events_per_benign_hour": 0.0,
+    "total_events": 118,
+    "ambiguous_or_out_of_scope_events": 64,
+    "label_runs": 12,
+    "detected_runs": 12,
+    "label_run_recall": 1.0,
+    "missed_runs": 0,
+    "detected_run_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "missed_run_ids": [],
+    "detected_run_latency_s": {
+      "0": 0.769461,
+      "1": 0.487536,
+      "2": 1.946104,
+      "3": 1.501679,
+      "4": 0.890142,
+      "5": 0.565687,
+      "6": 0.295702,
+      "7": 0.021601,
+      "8": 1.749603,
+      "9": 1.511447,
+      "10": 0.770863,
+      "11": 0.145994
+    },
+    "late_runs": 0,
+    "median_latency_s": 0.770162,
+    "mean_latency_s": 0.8879849166666668,
+    "coverage": {
+      "complete_windows": 3727,
+      "empty_windows": 2575,
+      "pure_benign": 372,
+      "pure_slowite": 198,
+      "mixed_unknown_other": 582,
+      "adjacent_benign_pairs": 0
+    }
+  },
+  {
+    "capture": 4,
+    "model": "RF",
+    "k": 2,
+    "classification": {
+      "confusion_matrix": [
+        [
+          372,
+          0
+        ],
+        [
+          55,
+          143
+        ]
+      ],
+      "precision": 1.0,
+      "recall": 0.7222222222222222,
+      "f1": 0.8387096774193549,
+      "fpr": 0.0
+    },
+    "false_events": 0,
+    "benign_confirmed_windows": 0,
+    "benign_hours": 0.20666666666666667,
+    "false_events_per_benign_hour": 0.0,
+    "total_events": 42,
+    "ambiguous_or_out_of_scope_events": 30,
+    "label_runs": 12,
+    "detected_runs": 12,
+    "label_run_recall": 1.0,
+    "missed_runs": 0,
+    "detected_run_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "missed_run_ids": [],
+    "detected_run_latency_s": {
+      "0": 6.769461,
+      "1": 2.487536,
+      "2": 3.946104,
+      "3": 3.501679,
+      "4": 6.890142,
+      "5": 2.565687,
+      "6": 2.295702,
+      "7": 2.021601,
+      "8": 3.749603,
+      "9": 3.511447,
+      "10": 2.770863,
+      "11": 2.145994
+    },
+    "late_runs": 0,
+    "median_latency_s": 3.136271,
+    "mean_latency_s": 3.554651583333333,
+    "coverage": {
+      "complete_windows": 3727,
+      "empty_windows": 2575,
+      "pure_benign": 372,
+      "pure_slowite": 198,
+      "mixed_unknown_other": 582,
+      "adjacent_benign_pairs": 0
+    }
+  },
+  {
+    "capture": 4,
+    "model": "RF",
+    "k": 3,
+    "classification": {
+      "confusion_matrix": [
+        [
+          372,
+          0
+        ],
+        [
+          55,
+          143
+        ]
+      ],
+      "precision": 1.0,
+      "recall": 0.7222222222222222,
+      "f1": 0.8387096774193549,
+      "fpr": 0.0
+    },
+    "false_events": 0,
+    "benign_confirmed_windows": 0,
+    "benign_hours": 0.20666666666666667,
+    "false_events_per_benign_hour": 0.0,
+    "total_events": 32,
+    "ambiguous_or_out_of_scope_events": 22,
+    "label_runs": 12,
+    "detected_runs": 10,
+    "label_run_recall": 0.8333333333333334,
+    "missed_runs": 2,
+    "detected_run_ids": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "missed_run_ids": [
+      0,
+      4
+    ],
+    "detected_run_latency_s": {
+      "1": 4.487536,
+      "2": 5.946104,
+      "3": 5.501679,
+      "5": 4.565687,
+      "6": 4.295702,
+      "7": 4.021601,
+      "8": 5.749603,
+      "9": 5.511447,
+      "10": 4.770863,
+      "11": 4.145994
+    },
+    "late_runs": 0,
+    "median_latency_s": 4.6682749999999995,
+    "mean_latency_s": 4.8996216,
+    "coverage": {
+      "complete_windows": 3727,
+      "empty_windows": 2575,
+      "pure_benign": 372,
+      "pure_slowite": 198,
+      "mixed_unknown_other": 582,
+      "adjacent_benign_pairs": 0
+    }
+  },
+  {
+    "capture": 4,
+    "model": "rate",
+    "k": 1,
+    "classification": {
+      "confusion_matrix": [
+        [
+          372,
+          0
+        ],
+        [
+          87,
+          111
+        ]
+      ],
+      "precision": 1.0,
+      "recall": 0.5606060606060606,
+      "f1": 0.7184466019417476,
+      "fpr": 0.0
+    },
+    "false_events": 0,
+    "benign_confirmed_windows": 0,
+    "benign_hours": 0.20666666666666667,
+    "false_events_per_benign_hour": 0.0,
+    "total_events": 68,
+    "ambiguous_or_out_of_scope_events": 50,
+    "label_runs": 12,
+    "detected_runs": 12,
+    "label_run_recall": 1.0,
+    "missed_runs": 0,
+    "detected_run_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "missed_run_ids": [],
+    "detected_run_latency_s": {
+      "0": 0.769461,
+      "1": 0.487536,
+      "2": 1.946104,
+      "3": 1.501679,
+      "4": 0.890142,
+      "5": 0.565687,
+      "6": 0.295702,
+      "7": 0.021601,
+      "8": 1.749603,
+      "9": 1.511447,
+      "10": 0.770863,
+      "11": 0.145994
+    },
+    "late_runs": 0,
+    "median_latency_s": 0.770162,
+    "mean_latency_s": 0.8879849166666668,
+    "coverage": {
+      "complete_windows": 3727,
+      "empty_windows": 2575,
+      "pure_benign": 372,
+      "pure_slowite": 198,
+      "mixed_unknown_other": 582,
+      "adjacent_benign_pairs": 0
+    }
+  },
+  {
+    "capture": 4,
+    "model": "rate",
+    "k": 2,
+    "classification": {
+      "confusion_matrix": [
+        [
+          372,
+          0
+        ],
+        [
+          87,
+          111
+        ]
+      ],
+      "precision": 1.0,
+      "recall": 0.5606060606060606,
+      "f1": 0.7184466019417476,
+      "fpr": 0.0
+    },
+    "false_events": 0,
+    "benign_confirmed_windows": 0,
+    "benign_hours": 0.20666666666666667,
+    "false_events_per_benign_hour": 0.0,
+    "total_events": 57,
+    "ambiguous_or_out_of_scope_events": 45,
+    "label_runs": 12,
+    "detected_runs": 12,
+    "label_run_recall": 1.0,
+    "missed_runs": 0,
+    "detected_run_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "missed_run_ids": [],
+    "detected_run_latency_s": {
+      "0": 2.769461,
+      "1": 2.487536,
+      "2": 3.946104,
+      "3": 3.501679,
+      "4": 2.890142,
+      "5": 2.565687,
+      "6": 2.295702,
+      "7": 2.021601,
+      "8": 3.749603,
+      "9": 3.511447,
+      "10": 2.770863,
+      "11": 2.145994
+    },
+    "late_runs": 0,
+    "median_latency_s": 2.770162,
+    "mean_latency_s": 2.887984916666667,
+    "coverage": {
+      "complete_windows": 3727,
+      "empty_windows": 2575,
+      "pure_benign": 372,
+      "pure_slowite": 198,
+      "mixed_unknown_other": 582,
+      "adjacent_benign_pairs": 0
+    }
+  },
+  {
+    "capture": 4,
+    "model": "rate",
+    "k": 3,
+    "classification": {
+      "confusion_matrix": [
+        [
+          372,
+          0
+        ],
+        [
+          87,
+          111
+        ]
+      ],
+      "precision": 1.0,
+      "recall": 0.5606060606060606,
+      "f1": 0.7184466019417476,
+      "fpr": 0.0
+    },
+    "false_events": 0,
+    "benign_confirmed_windows": 0,
+    "benign_hours": 0.20666666666666667,
+    "false_events_per_benign_hour": 0.0,
+    "total_events": 45,
+    "ambiguous_or_out_of_scope_events": 33,
+    "label_runs": 12,
+    "detected_runs": 12,
+    "label_run_recall": 1.0,
+    "missed_runs": 0,
+    "detected_run_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "missed_run_ids": [],
+    "detected_run_latency_s": {
+      "0": 4.769461,
+      "1": 4.487536,
+      "2": 5.946104,
+      "3": 5.501679,
+      "4": 4.890142,
+      "5": 4.565687,
+      "6": 4.295702,
+      "7": 4.021601,
+      "8": 5.749603,
+      "9": 5.511447,
+      "10": 4.770863,
+      "11": 4.145994
+    },
+    "late_runs": 0,
+    "median_latency_s": 4.770162,
+    "mean_latency_s": 4.8879849166666665,
+    "coverage": {
+      "complete_windows": 3727,
+      "empty_windows": 2575,
+      "pure_benign": 372,
+      "pure_slowite": 198,
+      "mixed_unknown_other": 582,
+      "adjacent_benign_pairs": 0
+    }
+  }
+]

@@ -1,0 +1,4 @@
+Browser tab: 1653507004, Title: "MQTTGuard — ESP32 AI + Persistence IDS - Wokwi ESP32, STM32, Arduino Simulator", URL: "https://wokwi.com/projects/478675756306751489".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+~				68 text 01:39.809 99%
+The focused UI element is 29 container VIN GND D13 D12 D14 D27 D26 D25 D33 D32 D35 D34 VN VP EN 3V3 GND D15 D2 D4 RX2 TX2 D5 D18 D19 D21 RX0 TX0 D22 D23 ESP32
