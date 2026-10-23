@@ -1,5 +1,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <atomic>
+static const char *BUILD_ID="de9898239e6ee3a8";
 // mqttguard_model.h
 
 #include <stdint.h>
@@ -501,24 +503,24 @@ static const ReplayWindow CLIP_1[] = {
 {729,true,0,{0x1.0000000000000p+2f,0x1.2af0000000000p+10f,0x1.016e20b6a0823p-1f,0x0.0p+0f}},
 };
 static const ReplayWindow CLIP_2[] = {
-{0,true,4,{0x1.0000000000000p+0f,0x1.3080000000000p+9f,0.0f,0x0.0p+0f}},
-{1,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{2,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{3,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{4,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{5,true,4,{0x1.0000000000000p+0f,0x1.3300000000000p+9f,0.0f,0x0.0p+0f}},
-{6,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{7,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{8,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{9,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{10,true,4,{0x1.0000000000000p+0f,0x1.3380000000000p+9f,0.0f,0x0.0p+0f}},
-{11,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{12,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{13,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{14,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{15,true,4,{0x1.0000000000000p+0f,0x1.3280000000000p+9f,0.0f,0x0.0p+0f}},
-{16,false,15,{0.0f,0.0f,0.0f,0.0f}},
-{17,false,15,{0.0f,0.0f,0.0f,0.0f}},
+{716,true,0,{0x1.1800000000000p+5f,0x1.13d999999999ap+10f,0x1.d8ed926517d7bp-5f,0x0.0p+0f}},
+{717,true,0,{0x1.2000000000000p+5f,0x1.2caaaaaaaaaabp+10f,0x1.c84af26c99865p-5f,0x0.0p+0f}},
+{718,false,15,{0.0f,0.0f,0.0f,0.0f}},
+{719,false,15,{0.0f,0.0f,0.0f,0.0f}},
+{720,true,4,{0x1.0000000000000p+0f,0x1.3b00000000000p+9f,0.0f,0x0.0p+0f}},
+{721,false,15,{0.0f,0.0f,0.0f,0.0f}},
+{722,false,15,{0.0f,0.0f,0.0f,0.0f}},
+{723,true,4,{0x1.0000000000000p+0f,0x1.2900000000000p+9f,0.0f,0x0.0p+0f}},
+{724,false,15,{0.0f,0.0f,0.0f,0.0f}},
+{725,true,0,{0x1.9800000000000p+5f,0x1.d1e1e1e1e1e1ep+5f,0x1.808edba582b0fp-7f,0x1.d696969696969p+5f}},
+{726,true,0,{0x1.8000000000000p+1f,0x1.db00000000000p+9f,0x1.01991361dc93fp-1f,0x0.0p+0f}},
+{727,true,0,{0x1.0000000000000p+2f,0x1.a020000000000p+9f,0x1.0129d6dab45dbp-1f,0x0.0p+0f}},
+{728,true,0,{0x1.4000000000000p+2f,0x1.20d999999999ap+10f,0x1.822e1ac57e23fp-2f,0x0.0p+0f}},
+{729,true,0,{0x1.0000000000000p+2f,0x1.2af0000000000p+10f,0x1.016e20b6a0823p-1f,0x0.0p+0f}},
+{730,true,0,{0x1.0000000000000p+2f,0x1.1640000000000p+10f,0x1.0172ef0ae5365p-1f,0x0.0p+0f}},
+{731,true,0,{0x1.0000000000000p+2f,0x1.4490000000000p+10f,0x1.017ba0d1e3d49p-1f,0x0.0p+0f}},
+{732,true,0,{0x1.0000000000000p+2f,0x1.3000000000000p+10f,0x1.015ed607975c6p-1f,0x0.0p+0f}},
+{733,true,0,{0x1.4000000000000p+2f,0x1.e81999999999ap+9f,0x1.81ec918e325d5p-2f,0x0.0p+0f}},
 };
 static const ReplayClip CLIPS[] = {{"BENIGN TRACE",CLIP_0,18},{"SLOWITE TRACE",CLIP_1,18},{"GAP TRACE",CLIP_2,18}};
 static const uint8_t CLIP_COUNT = 3;
@@ -561,19 +563,35 @@ uint32_t due=0, toneUntil=0;
 char runId[40], topic[100];
 struct Status { uint32_t id; int prediction; uint8_t streak[3]; bool active[3]; uint32_t events[3]; uint32_t inferenceUs; bool test; uint8_t clip; };
 QueueHandle_t statusQueue;
+std::atomic<bool> connectionFault(false);
+TaskHandle_t networkHandle=nullptr;
+bool verifyAll=false, outageTest=false;
+uint32_t periodMs=2000, inferenceCount=0, inferenceTotal=0, inferenceMin=UINT32_MAX, inferenceMax=0;
+
+void printMetrics() {
+  Serial.printf("METRICS build=%s inferences=%lu min_us=%lu mean_us=%.3f max_us=%lu heap_free=%u heap_min=%u image_bytes=%u status_bytes=%u replay_bytes=%u period_ms=%lu\n",BUILD_ID,(unsigned long)inferenceCount,(unsigned long)(inferenceCount?inferenceMin:0),inferenceCount?(double)inferenceTotal/inferenceCount:0.0,(unsigned long)inferenceMax,ESP.getFreeHeap(),ESP.getMinFreeHeap(),ESP.getSketchSize(),(unsigned)sizeof(Status),(unsigned)(sizeof(CLIP_0)+sizeof(CLIP_1)+sizeof(CLIP_2)),(unsigned long)periodMs);
+}
 
 void networkTask(void *) {
   WiFiClient transport;
   PubSubClient mqtt(transport);
-  mqtt.setServer(BROKER,1883);mqtt.setBufferSize(512);mqtt.setSocketTimeout(2);
+  mqtt.setServer(BROKER,1883);mqtt.setSocketTimeout(2);
+  if(!mqtt.setBufferSize(512)) { Serial.println("NETWORK_DISABLED buffer allocation failed"); vTaskDelete(nullptr); return; }
   WiFi.mode(WIFI_STA);WiFi.begin("Wokwi-GUEST","",6);
-  uint32_t retry=0;
+  uint32_t retry=0; bool appliedFault=false;
   Status latest={};bool pending=false;
   for(;;) {
+    bool requestedFault=connectionFault.load();
+    if(requestedFault!=appliedFault) {
+      mqtt.disconnect(); appliedFault=requestedFault; retry=0;
+      mqtt.setServer(appliedFault?"mqttguard-offline.invalid":BROKER,1883);
+      Serial.printf("NETWORK_TARGET fault=%d simulated_ms=%lu\n",appliedFault,(unsigned long)millis());
+    }
     if(WiFi.status()==WL_CONNECTED) {
       if(!mqtt.connected() && (int32_t)(millis()-retry)>=0) {
         retry=millis()+5000;
-        if(mqtt.connect(runId)) Serial.printf("MQTT_CONNECTED topic=%s\n",topic);
+        if(mqtt.connect(runId)) Serial.printf("MQTT_CONNECTED topic=%s fault=%d simulated_ms=%lu\n",topic,appliedFault,(unsigned long)millis());
+        else Serial.printf("MQTT_CONNECT_FAILED state=%d fault=%d simulated_ms=%lu\n",mqtt.state(),appliedFault,(unsigned long)millis());
       }
       if(mqtt.connected()) {
         mqtt.loop();
@@ -598,7 +616,14 @@ void restartScenario() {
 void stepWindow() {
   static const int TEST_PRED[]={0,1,0,1,1,0,1,1,1,-1,1,-1,1,1,1,0};
   static const uint32_t TEST_ID[]={0,1,2,3,4,5,6,7,8,9,10,11,13,13,14,15};
-  if(cursor >= (scripted?16:CLIPS[clipIndex].count)) {playing=false;Serial.println("END_OF_SCENARIO: Next or mode button restarts; start/pause replays.");return;}
+  if(cursor >= (scripted?16:CLIPS[clipIndex].count)) {
+    if(verifyAll && clipIndex+1<CLIP_COUNT) {clipIndex++;restartScenario();return;}
+    playing=false; verifyAll=false;
+    Serial.println("END_OF_SCENARIO: Next or mode button restarts; start/pause replays.");
+    printMetrics();return;
+  }
+  if(outageTest && cursor==4) {connectionFault.store(true);Serial.printf("FAULT_BEGIN simulated_ms=%lu\n",(unsigned long)millis());}
+  if(outageTest && cursor==10) {connectionFault.store(false);Serial.printf("FAULT_END simulated_ms=%lu\n",(unsigned long)millis());}
   uint32_t id;int prediction;uint32_t elapsed=0;double probability=-1;
   if(scripted) {id=TEST_ID[cursor];prediction=TEST_PRED[cursor];}
   else {
@@ -608,6 +633,9 @@ void stepWindow() {
       digitalWrite(MARKER,HIGH);uint32_t t=micros();
       probability=mqttguard_probability(x);prediction=probability>0.5?1:0;
       elapsed=micros()-t;digitalWrite(MARKER,LOW);
+      inferenceCount++;inferenceTotal+=elapsed;
+      if(elapsed<inferenceMin) inferenceMin=elapsed;
+      if(elapsed>inferenceMax) inferenceMax=elapsed;
     }
   }
   uint32_t oldEvents=state.events[1];bool accepted=state.accept(id,prediction);
@@ -621,8 +649,25 @@ void stepWindow() {
   cursor++;
 }
 
+void readCommands() {
+  static char command[24];static uint8_t length=0;
+  while(Serial.available()) {
+    char c=Serial.read();
+    if(c=='\r') continue;
+    if(c!='\n') {if(length<sizeof(command)-1) command[length++]=c;continue;}
+    command[length]=0;length=0;
+    if(!strcmp(command,"verify")) {scripted=false;clipIndex=0;periodMs=200;verifyAll=true;outageTest=false;connectionFault.store(false);restartScenario();}
+    else if(!strcmp(command,"selftest")) {scripted=false;clipIndex=1;periodMs=2000;verifyAll=false;outageTest=true;connectionFault.store(false);restartScenario();}
+    else if(!strcmp(command,"fault")) {connectionFault.store(true);}
+    else if(!strcmp(command,"recover")) {connectionFault.store(false);}
+    else if(!strcmp(command,"metrics")) {printMetrics();}
+    else Serial.println("COMMANDS verify | selftest | fault | recover | metrics");
+  }
+}
+
 void setup() {
   Serial.begin(115200);
+  Serial.printf("BUILD=%s\n",BUILD_ID);
   for(int pin:LEDS) {pinMode(pin,OUTPUT);digitalWrite(pin,LOW);}
   for(int pin:BUTTONS) pinMode(pin,INPUT_PULLUP);
   pinMode(BUZZER,OUTPUT);pinMode(MARKER,OUTPUT);
@@ -631,18 +676,20 @@ void setup() {
   Serial.printf("MQTTGuard RF 16 trees / depth 3 | dataset replay, not live packet capture\nTOPIC=%s\nheap=%u bytes\nGPIO25 next, GPIO26 pause/replay, GPIO27 scripted/AI\n",topic,ESP.getFreeHeap());
   statusQueue=xQueueCreate(1,sizeof(Status));
   if(!statusQueue) {Serial.println("FATAL status queue allocation");playing=false;return;}
-  xTaskCreatePinnedToCore(networkTask,"mqtt-status",6144,nullptr,1,nullptr,0);
+  if(xTaskCreatePinnedToCore(networkTask,"mqtt-status",6144,nullptr,1,&networkHandle,0)!=pdPASS) Serial.println("NETWORK_DISABLED task allocation failed");
   restartScenario();
 }
 
 void loop() {
   if(!statusQueue) {delay(10);return;}
+  readCommands();
   static bool last[3]={HIGH,HIGH,HIGH};static uint32_t changed[3]={0,0,0};
   for(int i=0;i<3;i++) {
     bool value=digitalRead(BUTTONS[i]);
     if(value!=last[i] && millis()-changed[i]>50) {
       last[i]=value;changed[i]=millis();
       if(value==LOW) {
+        verifyAll=false;outageTest=false;periodMs=2000;connectionFault.store(false);
         if(i==0){clipIndex=(clipIndex+1)%CLIP_COUNT;restartScenario();}
         if(i==1){if(!playing && cursor>=(scripted?16:CLIPS[clipIndex].count)) restartScenario();else {playing=!playing;due=millis()+2000;}}
         if(i==2){scripted=!scripted;restartScenario();}
@@ -650,6 +697,6 @@ void loop() {
     }
   }
   if(toneUntil && (int32_t)(millis()-toneUntil)>=0){noTone(BUZZER);toneUntil=0;}
-  if(playing && (int32_t)(millis()-due)>=0){stepWindow();due+=2000;}
+  if(playing && (int32_t)(millis()-due)>=0){stepWindow();due+=periodMs;}
   delay(1);
 }

@@ -202,7 +202,7 @@ Diagnostics and execution status:
 
 ## 13. Runtime and Reproducibility
 
-Current instrumentation records laptop batch prediction time and sampled Wokwi inference duration; the manifest labels laptop timing, and telemetry labels simulated timing. It does not yet provide a complete end-to-end timing distribution, flash/static-RAM build report, or physical power measurement. These are follow-up measurements, not established lightweight-deployment claims. Keep feature extraction, inference, confirmation, display and networking costs separate when extending instrumentation.
+Current instrumentation records laptop batch prediction time, the distribution of 53 observed Wokwi inference calls, firmware image size and heap usage; the manifest labels laptop timing, and telemetry labels simulated timing. It does not yet provide a complete end-to-end timing distribution, linker/static-RAM section report, or physical power measurement. These are follow-up measurements, not established lightweight-deployment claims. Keep feature extraction, inference, confirmation, display and networking costs separate when extending instrumentation.
 
 Save a run manifest, split assignment, fitted preprocessing, model, windows, predictions, confirmation states, event starts/ends, proxy outcomes, metric tables, and failure-case plots. Record exclusions and boundary policies. Relevant tests must cover exact boundary assignment, empty resets, capture resets, mixed-window handling, singleton features, event counting, and latency.
 
@@ -238,13 +238,13 @@ Stored clips contain original window IDs, valid/missing flags and feature values
 
 The C++ counter module rejects repeated/older IDs. Missing IDs reset streaks before fresh evidence. Empty input bypasses the RF and clears confirmation. Event totals increment only on an inactive-to-active transition. Each k has separate state; all consume the same predictions. The three LEDs expose active states and the buzzer signals new k=2 events.
 
-The default stored excerpt uses validation capture 3, windows 712-729. BENIGN TRACE and GAP TRACE currently share windows 0-17; acknowledge this presentation limitation. Full-capture evaluation uses complete held-out captures, not these selected excerpts.
+The default stored excerpt uses validation capture 3, windows 712-729. BENIGN TRACE uses windows 0-17 and the distinct GAP TRACE uses windows 716-733. Full-capture evaluation uses complete held-out captures, not these selected excerpts.
 
 ### Connected demonstration
 
 A separate task owns WiFi and PubSubClient; a one-record latest-status queue prevents network retries from blocking inference. MQTT messages use a unique per-boot topic and carry mode, window, prediction, confirmation states and event totals. Delivery is best-effort, not a reliable event transport.
 
-Actual status was received by the Python subscriber. Six checked-in received messages were compared with the frozen host model/counters with zero prediction or confirmation differences. Seven automated tests also pass. See [evidence](evidence/README.md) for scope and reproduction.
+Actual status was received by the Python subscriber. Six checked-in received messages were compared with the frozen host model/counters with zero prediction or confirmation differences. Twelve automated tests also pass. Complete observed target verification additionally covers 90 MODEL rows across all three clips, with zero prediction/probability/state discrepancies. A controlled client target-resolution fault demonstrated six replay rows processed while the connection was broken, followed by reconnection and independently received status. See [evidence](evidence/README.md) for scope and reproduction.
 
 Two evidence categories must remain distinct: ACTUAL_MODEL inputs execute the classifier; SCRIPTED_TEST directly injects predictions to verify counter behaviour. Never include scripted outcomes in classifier accuracy or attack-detection metrics.
 
@@ -256,4 +256,4 @@ The separate held-out-capture study reveals suppression/recall/delay trade-offs.
 
 ### Remaining work and claim limits
 
-Physical target timing/power, live packet capture, raw-record aggregation on ESP32, complete resource profiling, explicit broker-outage/recovery evidence and alternate-window sensitivity are not completed. The optional PCAP download was declined by the browser gate. The delivered contribution is an implemented, traceable embedded simulation and dataset-specific trade-off study, not proven operational protection of a live MQTT deployment.
+Physical target timing/power, live packet capture, raw-record aggregation on ESP32, complete linker/static-RAM profiling, exhaustive network-failure testing and alternate-window sensitivity are not completed. Simulator image/heap/timing measurements and a controlled target-resolution failure/recovery test are documented in [embedded verification](evidence/EMBEDDED_VERIFICATION.md). The optional PCAP download was declined by the browser gate. The delivered contribution is an implemented, traceable embedded simulation and dataset-specific trade-off study, not proven operational protection of a live MQTT deployment.

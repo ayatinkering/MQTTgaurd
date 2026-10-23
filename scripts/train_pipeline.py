@@ -183,7 +183,12 @@ def main():
     # Source-trace clips: fixed first benign, first slowite, and first idle transition in validation capture.
     cap=captures[3];pred,_=predict_capture(cap,imp,model); clips=[]
     for name,condition in [('BENIGN TRACE',lambda w:w['y']==0),('SLOWITE TRACE',lambda w:w['y']==1),('GAP TRACE',lambda w:not w['valid'])]:
-        start=next(i for i,w in enumerate(cap['windows']) if condition(w));start=max(0,start-2);selected=cap['windows'][start:start+18]
+        if name=='GAP TRACE':
+            first_slow=next(i for i,w in enumerate(cap['windows']) if w['y']==1)
+            start=next(i for i,w in enumerate(cap['windows']) if i>first_slow and not w['valid'] and cap['windows'][i-1]['valid'])
+        else:
+            start=next(i for i,w in enumerate(cap['windows']) if condition(w))
+        start=max(0,start-2);selected=cap['windows'][start:start+18]
         clips.append({'name':name,'capture':3,'start_window':start,'windows':selected})
     lines=['#pragma once','struct ReplayWindow { uint32_t id; bool valid; uint8_t missing; float x[4]; };','struct ReplayClip { const char *name; const ReplayWindow *rows; uint16_t count; };']
     for c,clip in enumerate(clips):

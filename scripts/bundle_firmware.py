@@ -1,10 +1,13 @@
 """Generate one browser-friendly sketch; source files remain independently testable."""
 from pathlib import Path
-import json
+import json, hashlib
 root=Path(__file__).resolve().parents[1];fw=root/'firmware/mqttguard';out=root/'firmware/wokwi';out.mkdir(parents=True,exist_ok=True)
 headers=['mqttguard_model.h','replay_data.h','confirmation.h']
 sketch=(fw/'sketch.ino').read_text()
 for h in headers:sketch=sketch.replace('#include "'+h+'"','// '+h+'\n'+(fw/h).read_text().replace('#pragma once',''))
+build_id=hashlib.sha256(sketch.encode()).hexdigest()[:16]
+sketch=sketch.replace('SOURCE_BUILD_ID',build_id)
+(out/'build.json').write_text(json.dumps({'build_id':build_id,'sketch_sha256':hashlib.sha256(sketch.encode()).hexdigest()},indent=2)+'\n')
 (out/'sketch.ino').write_text(sketch);(out/'libraries.txt').write_text((fw/'libraries.txt').read_text())
 parts=[{'type':'wokwi-esp32-devkit-v1','id':'esp','top':0,'left':0,'attrs':{}}];connections=[]
 for i,color in enumerate(['orange','red','purple']):

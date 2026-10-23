@@ -46,6 +46,7 @@ python3 scripts/inspect_dataset.py
 .venv/bin/python scripts/bundle_firmware.py
 .venv/bin/python -m pytest scripts -q
 .venv/bin/python scripts/verify_demo_evidence.py
+.venv/bin/python scripts/verify_wokwi_serial.py docs/evidence/wokwi-serial-full.txt
 ```
 
 Requires network for dependencies/data and a host `g++` compiler for export parity. Data acquisition uses curl. Training is small and CPU-only; no API key, GPU or model download is required. The locked environment was exercised on Linux/Python 3.12.14; other platforms need appropriate compiler/toolchain paths.
@@ -75,13 +76,16 @@ Requires network for dependencies/data and a host `g++` compiler for export pari
 - Original data files downloaded/audited and hashes recorded.
 - Primary and four capture-held-out experiments, rate baseline and ideal-label diagnostic executed.
 - Exported C++ matches Python on 11,210 inputs, including 321 threshold-boundary cases.
-- Seven automated tests pass, including actual C++ confirmation-module checks.
+- Twelve automated tests pass, including actual C++ confirmation-module checks and target-evidence rejection cases.
 - Wokwi built and ran the trained model; GPIO controls and scripted tests were observed.
 - Actual MQTT messages reached the independent laptop subscriber.
-- Six preserved received messages match host predictions and confirmation states.
+- Six initial received messages and 11 later recovery-test messages match host predictions and confirmation states.
+- Ninety observed MODEL rows cover complete target passes of all three distinct validation clips, with zero prediction/probability/state discrepancies.
+- Controlled target-resolution failure/recovery is verified; six replay rows ran during the fault, and MQTT reception resumed.
+- Simulator firmware image/heap and 53 inference timing samples are recorded in [embedded evidence](evidence/EMBEDDED_VERIFICATION.md).
 - Screenshot, received JSONL and an explicitly transcribed serial excerpt are under `docs/evidence/`.
 
-Do not overstate the scope: host parity covers all recorded valid windows, but the actual target-output evidence covers selected replay inputs/messages, not every window on the ESP32.
+Do not overstate the scope: host parity covers all recorded valid windows, but the actual target-output evidence covers all demonstration clips and repeated passes, not all 11,210 parity inputs on the ESP32.
 
 ## 6. Results to explain accurately
 
@@ -94,14 +98,14 @@ These are dataset-specific findings from one testbed/day. Run labels are proxies
 ## 7. Known issues and prioritized next work
 
 1. **Course submission:** update the original report/slides/synopsis with the current architecture and measured tables. Preserve the original PDF; edit its LaTeX/source if available. The repository does not contain that source. A suggested replacement methodology paragraph appears below.
-2. **More target verification:** collect an automatically exported complete serial log when browser permissions allow; compare every replay record, not just the six received messages. Do not bypass declined download permissions.
-3. **Network fault testing:** explicitly demonstrate broker unavailability and recovery. The architecture separates retries from inference and startup inference before connection was observed; extended outage/recovery is not yet verified.
-4. **Memory/timing evidence:** record build flash/static RAM and a complete inference-time distribution. Startup free heap alone is not a full memory report. GPIO23 is an unwired timing marker for optional logic-analyzer work.
-5. **Presentation clips/schema:** BENIGN TRACE and GAP TRACE currently share the first 18 validation windows. Make distinct excerpts if helpful. TEST messages currently retain capture=3, so mode must distinguish them; improve source identity in any revised schema.
+2. **Broader target verification:** full observed serial logs and all demonstration clips are now verified. Extend to additional held-out inputs if necessary; preserve explicit build identity. Do not bypass declined PCAP permissions.
+3. **Additional network fault testing:** the controlled invalid-hostname failure/recovery test is complete. Optional next cases are prolonged disconnection, repeated recovery and WiFi loss; do not claim one test covers all failures.
+4. **Resource evidence:** simulator image size, heap and timing distribution are captured. A full linker/static-RAM breakdown or physical-chip measurements remain optional follow-ups. GPIO23 is an unwired timing marker for optional logic-analyzer work.
+5. **Schema refinement:** the clips are now distinct. TEST messages still retain capture=3, so mode must distinguish them; improve test-source identity if extending consumers.
 6. **Research extensions:** 1/5-second sensitivity is not executed. Since test results have been inspected, new variants are exploratory. Keep the original 2-second result and avoid retuning the final test.
 7. **Optional later:** raw-record window aggregation on ESP32, a ThingsBoard view, new capture/testbed data, or live collection. These are extensions, not missing prerequisites for the existing demo.
 
-The PCAP download was declined by the browser gate. Later browser attachment was unavailable; no new browser verification was claimed after that. Continue with available source/evidence, or have the account owner reopen the project for further UI work.
+The PCAP download was declined by the browser gate and was not retried. Browser access later recovered, allowing direct capture of observed serial text, full target verification and the controlled connection-recovery test without any browser file download. The saved Wokwi project matches the source fingerprint in firmware/wokwi/build.json.
 
 ## 8. Safe development workflow
 

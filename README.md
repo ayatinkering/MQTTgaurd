@@ -37,7 +37,7 @@ This is **not a live packet sniffer or a live SlowITe attack testbed**. Topic su
 4. Read the serial monitor for predictions, window IDs, counters and the generated `TOPIC=` value.
 5. For independent MQTT reception, run the subscriber below using that exact topic.
 
-Scripted TEST mode deliberately bypasses AI to verify isolated positives, sustained positives, gaps and duplicates. It is not a classifier accuracy demonstration. See [the demo guide](docs/DEMO.md).
+Scripted TEST mode deliberately bypasses AI to verify isolated positives, sustained positives, gaps and duplicates. It is not a classifier accuracy demonstration. Serial commands `verify` and `selftest` run complete-clip and connection-recovery diagnostics. See [the demo guide](docs/DEMO.md).
 
 ## Reproduce locally
 
@@ -53,6 +53,7 @@ python3 scripts/inspect_dataset.py
 .venv/bin/python scripts/bundle_firmware.py
 .venv/bin/python -m pytest scripts -q
 .venv/bin/python scripts/verify_demo_evidence.py
+.venv/bin/python scripts/verify_wokwi_serial.py docs/evidence/wokwi-serial-full.txt
 ```
 
 The training command generates the fitted model and replay predictions under `reports/experiment/`, summary JSON under `docs/results/`, and firmware model/replay headers. The bundle command creates the browser-friendly Wokwi files under `firmware/wokwi/`. **Regeneration does not update the online Wokwi project automatically.**
@@ -79,7 +80,7 @@ Primary pure-window RF F1 is **0.8387**, with SlowITe-window recall **0.7222**. 
 
 **This primary test does not demonstrate false-alarm reduction:** immediate alerting already has zero clean benign false events, and capture 4 has no adjacent pure-benign two-second windows. A separate capture-held-out study exposes the trade-off: on capture 1, k=2 changes clean false events from 66 to 3 while run detections change from 84/84 to 83/84. All captures come from one testbed/day.
 
-The exported C++ model matched Python on **11,210 inputs**, including 321 threshold-boundary cases, with zero label disagreements. Seven automated tests pass. Wokwi execution and independent MQTT receipt were observed; evidence is checked in. See [full results and limitations](docs/results/RESULTS.md).
+The exported C++ model matched Python on **11,210 inputs**, including 321 threshold-boundary cases, with zero label disagreements. Twelve automated tests pass. Full target replay verification covers 90 observed MODEL rows, and a controlled broken-connection/recovery test passed while inference continued. See [embedded evidence](docs/evidence/EMBEDDED_VERIFICATION.md). See [full results and limitations](docs/results/RESULTS.md).
 
 ## Dataset
 

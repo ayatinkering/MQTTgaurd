@@ -1,0 +1,73 @@
+{
+  "build_id": "de9898239e6ee3a8",
+  "observed_model_rows": 90,
+  "observed_scripted_rows": 1,
+  "complete_clip_passes": [
+    "SLOWITE TRACE",
+    "BENIGN TRACE",
+    "SLOWITE TRACE",
+    "GAP TRACE",
+    "SLOWITE TRACE"
+  ],
+  "model_rows_by_clip": {
+    "SLOWITE TRACE": 54,
+    "BENIGN TRACE": 18,
+    "GAP TRACE": 18
+  },
+  "prediction_or_state_disagreements": 0,
+  "simulated_inference_us": {
+    "count": 53,
+    "min": 17,
+    "median": 140.0,
+    "p95": 147.0,
+    "max": 147
+  },
+  "controlled_failure": {
+    "failed_connection_observed": true,
+    "model_rows_processed_while_fault_active": 6,
+    "reconnected_after_recovery": true
+  },
+  "resource_snapshots": [
+    {
+      "build": "de9898239e6ee3a8",
+      "inferences": "12",
+      "min_us": "120",
+      "mean_us": "137.333",
+      "max_us": "147",
+      "heap_free": "221048",
+      "heap_min": "215200",
+      "image_bytes": "928112",
+      "status_bytes": "36",
+      "replay_bytes": "1296",
+      "period_ms": "2000"
+    },
+    {
+      "build": "de9898239e6ee3a8",
+      "inferences": "41",
+      "min_us": "25",
+      "mean_us": "131.878",
+      "max_us": "147",
+      "heap_free": "219196",
+      "heap_min": "214952",
+      "image_bytes": "928112",
+      "status_bytes": "36",
+      "replay_bytes": "1296",
+      "period_ms": "200"
+    },
+    {
+      "build": "de9898239e6ee3a8",
+      "inferences": "53",
+      "min_us": "17",
+      "mean_us": "131.208",
+      "max_us": "147",
+      "heap_free": "220608",
+      "heap_min": "214952",
+      "image_bytes": "928112",
+      "status_bytes": "36",
+      "replay_bytes": "1296",
+      "period_ms": "2000"
+    }
+  ],
+  "source_sha256": "a2dcdc4a7c8c6bd53f642b530230c891ce23c88c9b275ca174c857a9476c6dec",
+  "scope": "Observed Wokwi replay only; simulated timing, not physical hardware. Controlled target-resolution fault, not an outage induced at the public broker."
+}

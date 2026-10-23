@@ -15,7 +15,8 @@ This is the current implementation, not the earlier host-only proposal. Working 
 | `firmware/mqttguard/sketch.ino` | Arduino application: scheduling, inputs/outputs and network task |
 | `scripts/bundle_firmware.py` | Inline headers into `firmware/wokwi/sketch.ino` and generate circuit/library files |
 | `scripts/mqtt_status.py` | Receive exact-topic messages and write JSONL evidence |
-| `scripts/verify_demo_evidence.py` | Check recorded actual-model MQTT outputs against the host model and counter reference |
+| `scripts/verify_demo_evidence.py` | Check received actual-model MQTT outputs against the host model and counter reference |
+| `scripts/verify_wokwi_serial.py` | Verify complete observed target logs, probabilities, states, build ID and failure/recovery markers |
 
 Generated files are checked in so Wokwi can run without retraining. `data/`, `reports/` and `.venv/` are ignored. The fitted joblib model, complete-window feature CSVs, observed-run JSON and replay prediction arrays are regenerated under `reports/experiment/`. Raw data is not embedded in Git.
 
@@ -58,7 +59,7 @@ struct ReplayWindow {
 };
 ```
 
-All stored clips come from validation capture 3. They preserve consecutive source IDs, including empty windows. Default startup plays the SlowITe clip. Labels are not present in this structure. The baseline BENIGN TRACE and GAP TRACE currently select the same first 18 windows: one illustrates the normal data and its sparse availability. Distinct presentation clips are a small follow-up improvement, not a different research dataset.
+All stored clips come from validation capture 3. They preserve consecutive source IDs, including empty windows. Default startup plays the SlowITe clip. Labels are not present in this structure. The three clips now use distinct source starts: BENIGN=0, SLOWITE=712, GAP=716. Clip selection is illustrative; it does not replace full held-out evaluation.
 
 `Confirmation.accept(id,prediction)` returns false for duplicate/older IDs without updating counters. A nonconsecutive increasing ID resets streaks before accepting fresh evidence. Prediction -1 represents unavailable data and clears confirmation. Each policy has a capped streak, active flag and cumulative event counter. `reset()` clears temporal state while retaining totals; scenario restart assigns a fresh instance and resets totals as well.
 
@@ -102,13 +103,13 @@ A representative payload shape is:
 
 The subscriber receives only the exact generated topic by default. It appends JSON messages with host receive time to `reports/mqtt_received.jsonl`. Simulator time, host arrival time and dataset event time are different clocks.
 
-Wokwi's public gateway cannot directly reach a laptop-local broker. Public test-broker availability is not guaranteed, and no performance/security claims are based on it. Extended disconnection/recovery testing remains open; observed inference before initial broker connection and task separation support operation without an initial connection.
+Wokwi's public gateway cannot directly reach a laptop-local broker. Public test-broker availability is not guaranteed, and no performance/security claims are based on it. A controlled target-resolution failure/recovery test is verified: `selftest` switches only this client to an unresolvable diagnostic hostname, then restores the broker. This is not an induced outage at the public broker. Exhaustive network failure testing remains future work.
 
 ## 7. Verification and measurement boundaries
 
-Seven automated tests cover audit edge cases, temporal window boundaries, gaps/events, and the actual C++ confirmation header. Export parity is a separate training-stage gate. Checked-in MQTT messages provide independent reception evidence; the evidence verifier compares their actual-model outputs with the host reference.
+Twelve automated tests cover audit edge cases, temporal window boundaries, gaps/events, and the actual C++ confirmation header and rejection of inconsistent target evidence. Export parity is a separate training-stage gate. Checked-in MQTT messages provide independent reception evidence; the evidence verifier compares their actual-model outputs with the host reference.
 
-The observed Wokwi model calls took approximately 45-56 simulated microseconds in the sampled trace, and the startup log showed 289,548 free heap bytes before network-task creation. These are observations of the simulator configuration, not physical-device benchmarks or a full memory budget. Build flash/static-RAM usage has not yet been recorded. The inference marker exists for a future logic-analyzer check.
+The updated instrumented build produced 53 timing samples: median 140 and p95/max 147 simulated microseconds. It reported a 928,112-byte full firmware image, 214,952-byte minimum free heap, 36-byte Status and 1,296-byte replay arrays. The complete serial verifier checked 90 MODEL rows, including empty windows and repeats, with zero discrepancies. These are simulator observations, not physical-device benchmarks. The image includes the networking/runtime code; a full static-RAM/linker-section report remains future work. Details are in [embedded verification](evidence/EMBEDDED_VERIFICATION.md).
 
 The optional PCAP download was declined by the browser gate. Do not describe a PCAP as delivered or bypass that gate. Screenshots and received MQTT messages remain available.
 
@@ -131,3 +132,18 @@ Software-development guidance reference: T. Kassis, V. Agarwal, Y. He, D. Patel 
 - Wokwi networking and time/capture limitations: https://docs.wokwi.com/guides/esp32-wifi
 - Random Forest inference semantics: https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
 - Public broker endpoint and availability limits: https://test.mosquitto.org/
+
+## 10. Diagnostic commands and build identity
+
+Send these through Wokwi serial input (follow with Enter):
+
+| Command | Action |
+| --- | --- |
+| `verify` | Run all three actual-model clips at a clearly diagnostic 200-ms cadence |
+| `selftest` | Normal two-second SlowITe replay, failed-target injection at offset 4 and recovery at offset 10 |
+| `fault` / `recover` | Manually select the failed diagnostic target or normal broker |
+| `metrics` | Print simulated image/heap sizes and accumulated inference timing |
+
+The normal circuit buttons cancel automatic diagnostics, clear fault selection and restore the two-second cadence. Failed-target DNS/connect attempts run only in the network task. `connectionFault` is atomic across tasks; model state remains owned by the main loop. Buffer/task allocation failures are logged explicitly. `METRICS` wraps only the probability call; it excludes other pipeline stages.
+
+`bundle_firmware.py` replaces its source-build placeholder with a deterministic fingerprint and saves the final sketch SHA-256 in `firmware/wokwi/build.json`. Startup prints BUILD, letting the target verifier reject evidence from a different source revision. This is source identity, not reproducible compiler/runtime identity.

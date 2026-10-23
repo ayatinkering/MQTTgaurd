@@ -103,10 +103,10 @@
     {
       "name": "GAP TRACE",
       "capture": 3,
-      "start_window": 0,
+      "start_window": 716,
       "count": 18
     }
   ],
-  "batch_inference_us_per_valid_window": 1.1128541675336439,
+  "batch_inference_us_per_valid_window": 1.3632517392478702,
   "timing_note": "Laptop batch timing, not physical ESP32 inference."
 }

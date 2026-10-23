@@ -1,0 +1,6 @@
+{
+  "received_actual_model_messages_checked": 11,
+  "prediction_disagreements": 0,
+  "confirmation_disagreements": 0,
+  "scope": "Only checked-in received sample; host parity separately covers all recorded valid windows and boundary cases."
+}

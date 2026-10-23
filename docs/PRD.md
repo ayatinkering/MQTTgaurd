@@ -49,7 +49,7 @@ Live packet capture, actual broker exhaustion, physical hardware, on-device raw 
 | R10 | Handle gaps, duplicate IDs, resets and distinct event starts | Shared C++ module test and labelled Wokwi TEST mode |
 | R11 | Allow replay controls and readable local outputs | Working NEXT, PAUSE/PLAY and AI/TEST buttons; LEDs/serial |
 | R12 | Send computed MQTT status without blocking inference | Separate network task and nonblocking latest-status mailbox; actual subscriber evidence |
-| R13 | Expose connectivity limitations | Best-effort delivery documented; extended outage/recovery test remains open |
+| R13 | Expose connectivity limitations | Best-effort delivery and controlled target-resolution failure/recovery verified; exhaustive network fault testing remains open |
 | R14 | Provide reproducible source and handoff | Locked Python dependencies, generation commands, circuit and guides |
 
 No physical power, physical inference-latency or broad deployment claim is an acceptance requirement. Simulated timing must be labelled as simulated.
@@ -78,6 +78,6 @@ Separate capture-held-out results show suppression with a recall/latency trade-o
 
 Delivered core: data inspection, training/evaluation, generated embedded model, Wokwi circuit/firmware, MQTT subscriber, checked-in summaries/evidence and current-version guides.
 
-Remaining extensions are prioritized in HANDOFF: stronger automated firmware-output checks, broker outage/recovery evidence, embedded build memory report, optional 1/5-second development sensitivity, raw-record aggregation and optional dashboard. The main classifier and primary test must not be retuned simply to improve final numbers.
+Remaining extensions are prioritized in HANDOFF: remaining broader target inputs, exhaustive network failure modes, complete linker/static-RAM report, optional 1/5-second exploratory sensitivity, raw-record aggregation and optional dashboard. Complete-clip checks, controlled connection recovery and simulator image/heap/timing evidence are delivered. The main classifier and primary test must not be retuned simply to improve final numbers.
 
 The course PDF/slides still need their proposed-software-only paragraphs replaced with the current embedded simulation description. Repository documentation supplies the correct content; it does not modify the original submitted PDF.

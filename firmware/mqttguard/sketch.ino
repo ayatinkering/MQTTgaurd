@@ -1,5 +1,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <atomic>
+static const char *BUILD_ID="SOURCE_BUILD_ID";
 #include "mqttguard_model.h"
 #include "replay_data.h"
 #include "confirmation.h"
@@ -17,19 +19,35 @@ uint32_t due=0, toneUntil=0;
 char runId[40], topic[100];
 struct Status { uint32_t id; int prediction; uint8_t streak[3]; bool active[3]; uint32_t events[3]; uint32_t inferenceUs; bool test; uint8_t clip; };
 QueueHandle_t statusQueue;
+std::atomic<bool> connectionFault(false);
+TaskHandle_t networkHandle=nullptr;
+bool verifyAll=false, outageTest=false;
+uint32_t periodMs=2000, inferenceCount=0, inferenceTotal=0, inferenceMin=UINT32_MAX, inferenceMax=0;
+
+void printMetrics() {
+  Serial.printf("METRICS build=%s inferences=%lu min_us=%lu mean_us=%.3f max_us=%lu heap_free=%u heap_min=%u image_bytes=%u status_bytes=%u replay_bytes=%u period_ms=%lu\n",BUILD_ID,(unsigned long)inferenceCount,(unsigned long)(inferenceCount?inferenceMin:0),inferenceCount?(double)inferenceTotal/inferenceCount:0.0,(unsigned long)inferenceMax,ESP.getFreeHeap(),ESP.getMinFreeHeap(),ESP.getSketchSize(),(unsigned)sizeof(Status),(unsigned)(sizeof(CLIP_0)+sizeof(CLIP_1)+sizeof(CLIP_2)),(unsigned long)periodMs);
+}
 
 void networkTask(void *) {
   WiFiClient transport;
   PubSubClient mqtt(transport);
-  mqtt.setServer(BROKER,1883);mqtt.setBufferSize(512);mqtt.setSocketTimeout(2);
+  mqtt.setServer(BROKER,1883);mqtt.setSocketTimeout(2);
+  if(!mqtt.setBufferSize(512)) { Serial.println("NETWORK_DISABLED buffer allocation failed"); vTaskDelete(nullptr); return; }
   WiFi.mode(WIFI_STA);WiFi.begin("Wokwi-GUEST","",6);
-  uint32_t retry=0;
+  uint32_t retry=0; bool appliedFault=false;
   Status latest={};bool pending=false;
   for(;;) {
+    bool requestedFault=connectionFault.load();
+    if(requestedFault!=appliedFault) {
+      mqtt.disconnect(); appliedFault=requestedFault; retry=0;
+      mqtt.setServer(appliedFault?"mqttguard-offline.invalid":BROKER,1883);
+      Serial.printf("NETWORK_TARGET fault=%d simulated_ms=%lu\n",appliedFault,(unsigned long)millis());
+    }
     if(WiFi.status()==WL_CONNECTED) {
       if(!mqtt.connected() && (int32_t)(millis()-retry)>=0) {
         retry=millis()+5000;
-        if(mqtt.connect(runId)) Serial.printf("MQTT_CONNECTED topic=%s\n",topic);
+        if(mqtt.connect(runId)) Serial.printf("MQTT_CONNECTED topic=%s fault=%d simulated_ms=%lu\n",topic,appliedFault,(unsigned long)millis());
+        else Serial.printf("MQTT_CONNECT_FAILED state=%d fault=%d simulated_ms=%lu\n",mqtt.state(),appliedFault,(unsigned long)millis());
       }
       if(mqtt.connected()) {
         mqtt.loop();
@@ -54,7 +72,14 @@ void restartScenario() {
 void stepWindow() {
   static const int TEST_PRED[]={0,1,0,1,1,0,1,1,1,-1,1,-1,1,1,1,0};
   static const uint32_t TEST_ID[]={0,1,2,3,4,5,6,7,8,9,10,11,13,13,14,15};
-  if(cursor >= (scripted?16:CLIPS[clipIndex].count)) {playing=false;Serial.println("END_OF_SCENARIO: Next or mode button restarts; start/pause replays.");return;}
+  if(cursor >= (scripted?16:CLIPS[clipIndex].count)) {
+    if(verifyAll && clipIndex+1<CLIP_COUNT) {clipIndex++;restartScenario();return;}
+    playing=false; verifyAll=false;
+    Serial.println("END_OF_SCENARIO: Next or mode button restarts; start/pause replays.");
+    printMetrics();return;
+  }
+  if(outageTest && cursor==4) {connectionFault.store(true);Serial.printf("FAULT_BEGIN simulated_ms=%lu\n",(unsigned long)millis());}
+  if(outageTest && cursor==10) {connectionFault.store(false);Serial.printf("FAULT_END simulated_ms=%lu\n",(unsigned long)millis());}
   uint32_t id;int prediction;uint32_t elapsed=0;double probability=-1;
   if(scripted) {id=TEST_ID[cursor];prediction=TEST_PRED[cursor];}
   else {
@@ -64,6 +89,9 @@ void stepWindow() {
       digitalWrite(MARKER,HIGH);uint32_t t=micros();
       probability=mqttguard_probability(x);prediction=probability>0.5?1:0;
       elapsed=micros()-t;digitalWrite(MARKER,LOW);
+      inferenceCount++;inferenceTotal+=elapsed;
+      if(elapsed<inferenceMin) inferenceMin=elapsed;
+      if(elapsed>inferenceMax) inferenceMax=elapsed;
     }
   }
   uint32_t oldEvents=state.events[1];bool accepted=state.accept(id,prediction);
@@ -77,8 +105,25 @@ void stepWindow() {
   cursor++;
 }
 
+void readCommands() {
+  static char command[24];static uint8_t length=0;
+  while(Serial.available()) {
+    char c=Serial.read();
+    if(c=='\r') continue;
+    if(c!='\n') {if(length<sizeof(command)-1) command[length++]=c;continue;}
+    command[length]=0;length=0;
+    if(!strcmp(command,"verify")) {scripted=false;clipIndex=0;periodMs=200;verifyAll=true;outageTest=false;connectionFault.store(false);restartScenario();}
+    else if(!strcmp(command,"selftest")) {scripted=false;clipIndex=1;periodMs=2000;verifyAll=false;outageTest=true;connectionFault.store(false);restartScenario();}
+    else if(!strcmp(command,"fault")) {connectionFault.store(true);}
+    else if(!strcmp(command,"recover")) {connectionFault.store(false);}
+    else if(!strcmp(command,"metrics")) {printMetrics();}
+    else Serial.println("COMMANDS verify | selftest | fault | recover | metrics");
+  }
+}
+
 void setup() {
   Serial.begin(115200);
+  Serial.printf("BUILD=%s\n",BUILD_ID);
   for(int pin:LEDS) {pinMode(pin,OUTPUT);digitalWrite(pin,LOW);}
   for(int pin:BUTTONS) pinMode(pin,INPUT_PULLUP);
   pinMode(BUZZER,OUTPUT);pinMode(MARKER,OUTPUT);
@@ -87,18 +132,20 @@ void setup() {
   Serial.printf("MQTTGuard RF 16 trees / depth 3 | dataset replay, not live packet capture\nTOPIC=%s\nheap=%u bytes\nGPIO25 next, GPIO26 pause/replay, GPIO27 scripted/AI\n",topic,ESP.getFreeHeap());
   statusQueue=xQueueCreate(1,sizeof(Status));
   if(!statusQueue) {Serial.println("FATAL status queue allocation");playing=false;return;}
-  xTaskCreatePinnedToCore(networkTask,"mqtt-status",6144,nullptr,1,nullptr,0);
+  if(xTaskCreatePinnedToCore(networkTask,"mqtt-status",6144,nullptr,1,&networkHandle,0)!=pdPASS) Serial.println("NETWORK_DISABLED task allocation failed");
   restartScenario();
 }
 
 void loop() {
   if(!statusQueue) {delay(10);return;}
+  readCommands();
   static bool last[3]={HIGH,HIGH,HIGH};static uint32_t changed[3]={0,0,0};
   for(int i=0;i<3;i++) {
     bool value=digitalRead(BUTTONS[i]);
     if(value!=last[i] && millis()-changed[i]>50) {
       last[i]=value;changed[i]=millis();
       if(value==LOW) {
+        verifyAll=false;outageTest=false;periodMs=2000;connectionFault.store(false);
         if(i==0){clipIndex=(clipIndex+1)%CLIP_COUNT;restartScenario();}
         if(i==1){if(!playing && cursor>=(scripted?16:CLIPS[clipIndex].count)) restartScenario();else {playing=!playing;due=millis()+2000;}}
         if(i==2){scripted=!scripted;restartScenario();}
@@ -106,6 +153,6 @@ void loop() {
     }
   }
   if(toneUntil && (int32_t)(millis()-toneUntil)>=0){noTone(BUZZER);toneUntil=0;}
-  if(playing && (int32_t)(millis()-due)>=0){stepWindow();due+=2000;}
+  if(playing && (int32_t)(millis()-due)>=0){stepWindow();due+=periodMs;}
   delay(1);
 }

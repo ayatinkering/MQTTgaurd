@@ -4,7 +4,7 @@ Run train_pipeline.py first. This does not claim full simulated-target coverage:
 it verifies only the actual received sample preserved in docs/evidence.
 """
 from pathlib import Path
-import json
+import json,argparse
 import joblib
 from train_pipeline import ROOT,make_capture,predict_capture,confirm
 
@@ -15,7 +15,8 @@ def main():
     cap=make_capture(ROOT/'data/raw/MQTTEEB-D_dataset_loop_3.csv',3)
     prediction,_=predict_capture(cap,saved['imputer'],saved['model'])
     manifest=json.loads((ROOT/'docs/results/manifest.json').read_text()); clips=manifest['clips']
-    evidence=ROOT/'docs/evidence/mqtt_received.jsonl'; checked=0
+    parser=argparse.ArgumentParser();parser.add_argument('--file',type=Path,default=ROOT/'docs/evidence/mqtt_received.jsonl');parser.add_argument('--output',type=Path,default=ROOT/'docs/evidence/verification.json');args=parser.parse_args()
+    evidence=args.file; checked=0
     for line in evidence.read_text().splitlines():
         p=json.loads(line)['payload']
         if p['mode']!='ACTUAL_MODEL':continue
@@ -36,6 +37,6 @@ def main():
         checked+=1
     assert checked>0,'No actual-model messages checked'
     result={'received_actual_model_messages_checked':checked,'prediction_disagreements':0,'confirmation_disagreements':0,'scope':'Only checked-in received sample; host parity separately covers all recorded valid windows and boundary cases.'}
-    (ROOT/'docs/evidence/verification.json').write_text(json.dumps(result,indent=2)+'\n')
+    args.output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result,indent=2))
 if __name__=='__main__':main()

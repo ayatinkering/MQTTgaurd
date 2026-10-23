@@ -30,7 +30,9 @@ Only normal demonstration status is published to a public test broker. If the br
 - Orange/red/purple LEDs: active confirmation at k=1/2/3.
 - Buzzer: short notification at a new k=2 event.
 
-Each clip has 18 records, normally about 36 simulated seconds. BENIGN TRACE and GAP TRACE currently use the same initial validation excerpt; this is noted in IMPLEMENTATION. Do not claim they are independent evaluation sequences.
+Each clip has 18 records, normally about 36 simulated seconds. They start at validation window IDs 0, 712 and 716; the SlowITe and gap clips overlap, so these are not independent evaluation sequences.
+
+For verification, enter `verify` in serial input to run every clip at 200-ms cadence. Enter `selftest` to show controlled connection failure/recovery at the normal cadence. `metrics` prints resource/timing observations. These diagnostic timings do not replace dataset event-time latency metrics. See [verified results](evidence/EMBEDDED_VERIFICATION.md).
 
 ## Troubleshooting
 
