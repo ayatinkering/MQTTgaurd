@@ -154,6 +154,13 @@ def main():
     fw=ROOT/'firmware/mqttguard';fw.mkdir(parents=True,exist_ok=True)
     results_dir=ROOT/'docs/results';results_dir.mkdir(parents=True,exist_ok=True)
     captures={i:make_capture(ROOT/f'data/raw/MQTTEEB-D_dataset_loop_{i}.csv',i) for i in range(1,5)}
+    for cap in captures.values():
+        with (out/f'capture_{cap["id"]}_windows.csv').open('w',newline='') as stream:
+            writer=csv.writer(stream)
+            writer.writerow(['capture','window_id','end_epoch_us','valid','scoring_label','label_composition']+FEATURES)
+            for w in cap['windows']:
+                writer.writerow([cap['id'],w['id'],w['end'],w['valid'],w['y'],json.dumps(w['labels'],sort_keys=True)]+w['x'])
+    (out/'observed_label_runs.json').write_text(json.dumps({i:c['runs'] for i,c in captures.items()},indent=2)+'\n')
     imp,model,rate,candidates=fit(captures,[1,2],3)
     export_model(model,imp,fw/'mqttguard_model.h'); parity=verify_export(model,imp,captures,out)
     results=[]; predictions={}

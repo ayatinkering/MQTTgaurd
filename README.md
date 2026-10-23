@@ -1,87 +1,112 @@
 # MQTTGuard
 
-### Lightweight Persistence-Aware Intrusion Detection for Slow MQTT Attacks
+**Trace-driven ESP32 simulation of a lightweight, persistence-aware intrusion detector for slow MQTT attacks.**
 
-MQTTGuard is an embedded systems and AIoT research project that combines Random Forest classification with temporal persistence to detect SlowITe attacks in MQTT traffic. It investigates whether requiring consecutive suspicious predictions before confirming an attack can reduce false alerts while retaining label-run proxy recall and acceptable detection latency.
+MQTTGuard is an Embedded Systems + AIoT course project. We train a compact Random Forest on recorded MQTTEEB-D traffic, export the learned model to C++, and run **actual inference and alert confirmation on an ESP32 simulated in Wokwi**. The ESP32 also publishes its computed status over MQTT to a laptop subscriber.
 
-**Status:** Working ESP32/Wokwi implementation, trained Random Forest, verified C++ export, and actual MQTT reporting. See [current implementation status](docs/STATUS.md) and [measured results](docs/results/RESULTS.md). Final documentation integration is in progress.
+**[Open the working Wokwi demo](https://wokwi.com/projects/478675756306751489)** · **[Current status](docs/STATUS.md)** · **[Start here if taking over the project](docs/HANDOFF.md)**
 
-**[Open the working Wokwi demo](https://wokwi.com/projects/478675756306751489)**
-
-## Problem
-
-Slow MQTT attacks can persist without the abrupt traffic increases associated with flooding. A classifier may identify suspicious traffic, but immediately turning every positive prediction into an alert can produce unnecessary alarms. MQTTGuard adds a small stateful confirmation layer after classification.
-
-## Proposed Pipeline
+## What the current version does
 
 ```mermaid
 flowchart TD
-    A[MQTTEEB-D observations] --> B[Select Legitimate and SlowITe traffic]
-    B --> C[Preserve timestamps and capture boundaries]
-    C --> D[Construct fixed 2-second windows]
-    D --> E[Extract four traffic features]
-    E --> F[Random Forest classifier]
-    F --> G[Consecutive-window confirmation]
-    G --> H[Confirmed attack alert]
+    A[Original MQTTEEB-D captures] --> B[Python: 2-second windows and four features]
+    B --> C[Train and validate compact Random Forest]
+    C --> D[Export verified C++ model]
+    B --> E[Chronological validation replay clips]
+    D --> F[Wokwi ESP32: on-device inference]
+    E --> F
+    F --> G[Parallel k=1, k=2 and k=3 confirmation]
+    G --> H[LEDs, buzzer and serial monitor]
+    G --> I[MQTT status broker]
+    I --> J[Python subscriber and evidence log]
 ```
 
-Each window contains four features: observation count, mean TCP length, mean inter-arrival time, and mean MQTT keep-alive. The classifier predicts Legitimate or Suspicious.
+- **AI:** a trained 16-tree Random Forest, maximum depth 3; inference runs in firmware.
+- **Embedded systems:** ESP32 C++, timed replay, GPIO, debounced buttons, state machines and a separate network task.
+- **IoT:** MQTT security data and working status publication from Wokwi to an independent subscriber.
+- **Simulation:** recorded network features are replayed into the simulated device. Feature extraction and training run on the host.
 
-| Configuration | Consecutive suspicious windows required |
-| --- | ---: |
-| Immediate Random Forest baseline | 1 |
-| MQTTGuard, proposed configuration | 2 |
-| Strict persistence comparison | 3 |
+This is **not a live packet sniffer or a live SlowITe attack testbed**. Topic subscriptions do not provide the TCP/MQTT fields needed by the detector. Physical deployment, automatic blocking, ThingsBoard and raw-packet feature extraction on ESP32 remain future work.
 
-The same held-out classifier predictions will be used for all three comparisons. Requiring persistence introduces a detection-delay trade-off; its benefit must be measured.
+## Try the demo
 
-## Dataset and Scope
+1. Open the Wokwi link and press **Start simulation**. No local model server is needed.
+2. Default mode replays a recorded SlowITe excerpt through the actual model. The three LEDs show confirmation for k=1, 2 and 3; the buzzer sounds on a new k=2 event.
+3. **NEXT TRACE** selects an excerpt; **PAUSE / PLAY** controls playback; **AI / TEST** switches to explicitly labelled scripted confirmation tests.
+4. Read the serial monitor for predictions, window IDs, counters and the generated `TOPIC=` value.
+5. For independent MQTT reception, run the subscriber below using that exact topic.
 
-The inspected official **MQTTEEB-D version 2** contains 222,813 rows, including **17,557 Legitimate** and **20,090 SlowITe** rows, plus **246 missing labels**. The cleaned CSV matches the combined four raw captures exactly by row multiset. All downloaded files passed publisher SHA-256 verification.
+Scripted TEST mode deliberately bypasses AI to verify isolated positives, sustained positives, gaps and duplicates. It is not a classifier accuracy demonstration. See [the demo guide](docs/DEMO.md).
 
-Initial work uses recorded traffic and local software processing to represent detection at an IoT gateway. Hardware deployment, live packet capture, cloud inference, multiclass detection, and automatic blocking are future work.
+## Reproduce locally
 
-Raw CSVs are downloaded locally into `data/raw/` and excluded from Git. The official release is [available on Mendeley](https://data.mendeley.com/datasets/jfttfjn6tr/2) under CC BY 4.0. See the [dataset review](docs/DATASET_REVIEW.md) and [manifest](docs/DATASET_MANIFEST.json) for provenance and checksums.
-
-**Dataset caveats:** `tcp_time_delta` repeats the absolute timestamp, so timing features must be recomputed. Benign traffic is sparse: capture 4 has no adjacent pure-benign two-second windows. This can make persistence appear more effective at suppressing false alarms; the methodology requires explicit checks for that effect.
-
-## Download and Inspect
-
-Requires Python 3.10+ and `curl`; no third-party Python packages are needed for inspection. Run from the repository root:
+Use Python 3.12, `uv`, `curl`, and `g++`. Python 3.12.14 and scikit-learn 1.9.1 were used for the checked-in results.
 
 ```bash
+uv venv --python 3.12 .venv
+uv pip install --python .venv/bin/python -r requirements.lock
 python3 scripts/download_dataset.py
 python3 scripts/inspect_dataset.py
-python3 -m unittest discover -s scripts -p "test_*.py" -v
+.venv/bin/python scripts/train_pipeline.py
+.venv/bin/python scripts/publish_results.py
+.venv/bin/python scripts/bundle_firmware.py
+.venv/bin/python -m pytest scripts -q
+.venv/bin/python scripts/verify_demo_evidence.py
 ```
 
-Open `reports/dataset_preview.html` to view sample rows and summaries. Detailed evidence is saved in `reports/dataset_audit.json` and per-file window CSVs. Inspection does not train a detector. Generated reports remain local and can be regenerated.
+The training command generates the fitted model and replay predictions under `reports/experiment/`, summary JSON under `docs/results/`, and firmware model/replay headers. The bundle command creates the browser-friendly Wokwi files under `firmware/wokwi/`. **Regeneration does not update the online Wokwi project automatically.**
 
-## Evaluation
+For MQTT reception while Wokwi is running:
 
-- **Classification:** precision, recall, F1-score, false-positive rate, and confusion matrix.
-- **Operational detection:** false alert events, label-run proxy recall, missed episodes, and time to first confirmed alert.
-- **Efficiency:** processing time per window; resource claims require measurements.
+```bash
+.venv/bin/python scripts/mqtt_status.py --topic 'mqttguard/PASTE_THE_RUN_ID/status' --seconds 120
+```
 
-Chronological evaluation must retain capture boundaries and gaps. Mixed-class transition windows are excluded from classifier development, as proposed in the report; their treatment during operational evaluation is specified in the methodology. No experimental improvement is claimed yet.
+Use the topic printed by the running simulation, not the placeholder. MQTT uses the public test broker `test.mosquitto.org:1883`; only ordinary demo status is published. Delivery is best-effort. A latest-status mailbox keeps network retries separate from inference; the public broker is not a performance benchmark or production security service.
 
-## Documentation
+## Measured research results
 
-- [Verified dataset findings and download source](docs/DATASET_REVIEW.md)
-- [Product requirements and ordered build checklist](docs/PRD.md)
-- [Step-by-step methodology and evaluation protocol](docs/METHODOLOGY.md)
-- [Original report references and attribution corrections](docs/REPORT_REFERENCES.md)
+Primary split: train captures 1+2, validate 3, test 4. The same classifier predictions feed each confirmation policy.
 
-**Planned stack:** Python, pandas, NumPy, scikit-learn, and plotting libraries. Installation and execution instructions will be added alongside working code.
+| k | Clean false events | Observed SlowITe runs detected | Mean delay among detected runs |
+| --- | ---: | ---: | ---: |
+| 1 | 0 | 12/12 | 0.888 s |
+| 2 | 0 | 12/12 | 3.555 s |
+| 3 | 0 | 10/12 | 4.900 s |
 
-## Future Work
+Primary pure-window RF F1 is **0.8387**, with SlowITe-window recall **0.7222**. Run detection and window recall are different metrics.
 
-Adaptive windows, two-of-three confirmation, additional attack classes, live MQTT monitoring, Raspberry Pi deployment, CPU and memory profiling, and broker or firewall integration.
+**This primary test does not demonstrate false-alarm reduction:** immediate alerting already has zero clean benign false events, and capture 4 has no adjacent pure-benign two-second windows. A separate capture-held-out study exposes the trade-off: on capture 1, k=2 changes clean false events from 66 to 3 while run detections change from 84/84 to 83/84. All captures come from one testbed/day.
 
-## Team
+The exported C++ model matched Python on **11,210 inputs**, including 321 threshold-boundary cases, with zero label disagreements. Seven automated tests pass. Wokwi execution and independent MQTT receipt were observed; evidence is checked in. See [full results and limitations](docs/results/RESULTS.md).
 
-- Ayati Rauthan
-- Ireshi Rawat
-- Pranav Tawakley
+## Dataset
 
-The project name follows the report's **MQTTGuard** spelling. The GitHub repository is named [`MQTTgaurd`](https://github.com/ayatinkering/MQTTgaurd).
+[MQTTEEB-D version 2](https://data.mendeley.com/datasets/jfttfjn6tr/2), CC BY 4.0. The inspected combined file contains 222,813 observations: 17,557 Legitimate, 20,090 SlowITe, other attack classes and 246 missing labels. Use original capture loops, not a concatenation of raw and cleaned copies.
+
+The `tcp_time_delta` column repeats absolute timestamps; we recompute timing. Empty windows remain visible and break confirmation. Source labels enter fitting/scoring only, never embedded prediction. See [dataset audit](docs/DATASET_REVIEW.md).
+
+## Documentation map
+
+| Document | Purpose |
+| --- | --- |
+| [Handoff](docs/HANDOFF.md) | Current decisions, setup, file ownership, next work and pitfalls |
+| [PRD](docs/PRD.md) | Current product requirements and acceptance status |
+| [Methodology](docs/METHODOLOGY.md) | Exact dataset, training, replay and evaluation protocol |
+| [Implementation](docs/IMPLEMENTATION.md) | Host/firmware interfaces, export, controls and networking |
+| [Demo](docs/DEMO.md) | Repeatable presentation and troubleshooting |
+| [Status](docs/STATUS.md) | Completed work, verification and outstanding limitations |
+| [Results](docs/results/RESULTS.md) | Measured tables and plot |
+| [Evidence](docs/evidence/README.md) | Observed Wokwi and MQTT evidence |
+| [References](docs/REPORT_REFERENCES.md) | Original bibliography and attribution corrections |
+
+The original PDF describes the earlier host-only proposal. Repository documentation now defines the current ESP32/Wokwi version. Existing PDFs have not been rewritten.
+
+## Team and development support
+
+Ayati Rauthan · Ireshi Rawat · Pranav Tawakley.
+
+Repository: [ayatinkering/MQTTguard](https://github.com/ayatinkering/MQTTguard). The local directory retains the earlier `MQTTgaurd` spelling.
+
+Development used the reviewed K-Dense scikit-learn and scientific-critical-thinking skills; they are optional guidance, not runtime dependencies. Attribution and reinstall details are in [the implementation guide](docs/IMPLEMENTATION.md).

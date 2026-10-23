@@ -107,6 +107,6 @@
       "count": 18
     }
   ],
-  "batch_inference_us_per_valid_window": 0.7195624978824829,
+  "batch_inference_us_per_valid_window": 1.1128541675336439,
   "timing_note": "Laptop batch timing, not physical ESP32 inference."
 }

@@ -1,6 +1,6 @@
 # MQTTGuard implementation status
 
-Updated: 2026-10-23. Working implementation; final documentation pass in progress.
+Updated: 2026-10-23. Core implementation and current-version handoff documentation complete. Follow-up experiments are listed separately.
 
 **Live demo:** https://wokwi.com/projects/478675756306751489
 
@@ -14,8 +14,8 @@ Updated: 2026-10-23. Working implementation; final documentation pass in progres
 - [x] Received actual Wokwi MQTT status messages in Python; evidence saved.
 - [x] Seven Python/host-C++ tests passed, including the final checkpoint rerun.
 - [x] Saved research summaries, diagnostic results, plot, serial evidence and screenshot.
-- [ ] Finish README/PRD/methodology integration and concise demo guide.
-- [ ] Final consistency checks and firmware/output agreement evidence.
+- [x] Rewritten README/PRD/methodology for the current embedded version; added implementation, demo and teammate handoff guides.
+- [x] Final reproduction/test/link checks; all six preserved actual-model MQTT messages match host predictions/counters.
 
 ## Measured primary result
 
@@ -28,6 +28,10 @@ Train loops 1+2, validate loop 3, test loop 4. Selected RF: 16 trees, depth 3. W
 | 3 | 0 | 10/12 | 4.900 s |
 
 No false-alarm reduction is demonstrated on this primary capture: k=1 already has zero, and adjacent pure-benign windows are absent. Separate robustness results expose the trade-off, e.g. capture 1 changes 66 to 3 false events at k=2 while detections change 84/84 to 83/84. These are observed label runs from one testbed/day, not independently validated attack executions.
+
+## Handoff and current verification
+
+Start with [HANDOFF](HANDOFF.md), then [IMPLEMENTATION](IMPLEMENTATION.md), [METHODOLOGY](METHODOLOGY.md), and [DEMO](DEMO.md). Generated model export parity covers 11,210 inputs with zero label disagreements; seven automated tests pass. The six-message integration sample is separately verified by `scripts/verify_demo_evidence.py`.
 
 ## Boundaries and remaining limitations
 

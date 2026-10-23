@@ -1,4 +1,4 @@
-# MQTTGuard: Step-by-Step Experimental Methodology
+# MQTTGuard: Current Research and Embedded Simulation Methodology
 
 ## 1. What We Are Testing
 
@@ -6,7 +6,9 @@ The detector first classifies a traffic window using a Random Forest, then optio
 
 **Fixed primary configuration:** 2-second, non-overlapping windows; four features; Random Forest; k = 1, 2, and 3. The same trained model and held-out predictions serve all k values.
 
-The report supplies this core proposal. This protocol adds explicit rules where the report was incomplete and incorporates the actual downloaded data. No model performance has been measured yet.
+The original report supplies the core research question. The current implementation extends it with actual C++ Random Forest inference and confirmation on a Wokwi ESP32, plus working MQTT status reporting. Training and feature extraction remain on the host. Primary and capture-held-out results have been measured; see [RESULTS](results/RESULTS.md), [IMPLEMENTATION](IMPLEMENTATION.md), and [HANDOFF](HANDOFF.md).
+
+This is trace-driven embedded simulation, not a live network sniffer or a live attack against a broker. The repository methodology supersedes software-only assumptions in the original PDF.
 
 ## 2. Acquire the Correct Files
 
@@ -113,7 +115,7 @@ This distinction matters: **training labels choose fitting examples; replay labe
 
 ## 8. Train the Model and Baselines
 
-Train a fixed-seed Random Forest with a small, documented validation search over tree count and depth. Save the feature order, imputer, class mapping, parameters, seed, software versions, and model artifact.
+Implemented selection: evaluate 8/16 trees crossed with maximum depth 3/5; seed 42, minimum leaf size 2, balanced class weights. Fit the median-imputation/float32/RF pipeline on training captures only. Choose maximum validation F1, then fewer total nodes, fewer trees, and smaller depth. The selected primary model has 16 trees/depth 3. Save feature order, medians, class mapping, parameters, versions and dataset hashes. Do not refit on validation/test after selection.
 
 Before interpreting the AI result, compare against a simple count/rate threshold, fitted and selected on training/validation data under the same split. That asks whether AI adds value beyond traffic intensity in this dataset. Apply the same k comparisons to this baseline where feasible.
 
@@ -189,18 +191,18 @@ Emit predictions at the **end** of a complete window. State whether measured com
 
 Capture 4 has no adjacent pure-benign 2-second windows under the inspected alignment. Under the clean benign-event definition, k >= 2 cannot produce a false event there, regardless of model quality. Reporting that zero alone as a powerful AI improvement would be misleading.
 
-Required diagnostics:
+Diagnostics and execution status:
 
 1. Show adjacent benign-window opportunities and empty-window frequency for each capture.
 2. Run a clearly labelled ideal-label diagnostic: use perfect pure-window labels as predictions, retain gaps, and measure the maximum proxy coverage allowed by windowing and persistence. Mixed/unknown windows remain uncertain in this diagnostic. It is not trained-model performance.
 3. Compare with the rate/count baseline and inspect which feature drives separation.
-4. Evaluate 1-, 2-, and 5-second windows as a development sensitivity analysis. Keep 2 seconds as the primary report configuration; freeze alternative settings before final tests.
+4. Current results use the frozen 2-second protocol only. A 1/5-second sensitivity study is deferred and must be labelled exploratory because primary test outcomes have already been inspected. Do not retroactively describe alternative settings as pre-registered.
 5. Report every held-out capture separately and explain loop 4's sparse benign traffic.
 6. Preserve zero-effect results: if k = 1 already produces no false alerts, k = 2 cannot demonstrate a further reduction on that test.
 
 ## 13. Runtime and Reproducibility
 
-Measure window feature processing, imputation/inference, and confirmation using a monotonic clock. Separate training time from replay processing. Report typical and tail times, hardware, model size, and dependency versions. Compare processing time with the window duration. A fast laptop run is not proof of Raspberry Pi suitability.
+Current instrumentation records laptop batch prediction time and sampled Wokwi inference duration; the manifest labels laptop timing, and telemetry labels simulated timing. It does not yet provide a complete end-to-end timing distribution, flash/static-RAM build report, or physical power measurement. These are follow-up measurements, not established lightweight-deployment claims. Keep feature extraction, inference, confirmation, display and networking costs separate when extending instrumentation.
 
 Save a run manifest, split assignment, fitted preprocessing, model, windows, predictions, confirmation states, event starts/ends, proxy outcomes, metric tables, and failure-case plots. Record exclusions and boundary policies. Relevant tests must cover exact boundary assignment, empty resets, capture resets, mixed-window handling, singleton features, event counting, and latency.
 
@@ -217,3 +219,41 @@ The defensible contribution is an empirical evaluation of lightweight temporal c
 - Dataset creators' associated application study, listed in the release README: https://doi.org/10.1038/s41598-025-28516-2
 - Detection-latency evaluation background: https://doi.org/10.1007/s10664-025-10766-3
 - Original project-report bibliography, preserved with verification notes: [REPORT_REFERENCES.md](REPORT_REFERENCES.md).
+
+## 16. Embedded Implementation and Validation
+
+### What changed from the original proposal
+
+The earlier report put microcontroller deployment in future scope. The current implementation trains in Python, exports its classifier to C++, and executes both inference and confirmation on a simulated ESP32. Host-precomputed feature windows are the device input. An independent network task publishes already computed status through MQTT. No temperature/sensor reading substitutes for network traffic features.
+
+### Model export
+
+Export original tree thresholds and leaf class proportions, average probabilities as in scikit-learn, use float32 feature inputs, and predict suspicious only for probability >0.5. Export the training medians and missing mask convention. No hard-vote substitution or quantization is used.
+
+The host-compiled generated header was compared against Python on 11,210 inputs: all complete valid recorded windows and 321 threshold-boundary cases. Labels and probabilities matched exactly. This host verification does not alone establish target execution; actual Wokwi outputs and independently received MQTT messages provide separate evidence.
+
+### Firmware replay
+
+Stored clips contain original window IDs, valid/missing flags and feature values, with no ground-truth label field. Replay all intervals, including empty ones, at two simulated seconds per record. Start each excerpt with fresh counters and identify it as a validation excerpt rather than an independent experiment. Buttons control scenario, playback and labelled scripted-test mode.
+
+The C++ counter module rejects repeated/older IDs. Missing IDs reset streaks before fresh evidence. Empty input bypasses the RF and clears confirmation. Event totals increment only on an inactive-to-active transition. Each k has separate state; all consume the same predictions. The three LEDs expose active states and the buzzer signals new k=2 events.
+
+The default stored excerpt uses validation capture 3, windows 712-729. BENIGN TRACE and GAP TRACE currently share windows 0-17; acknowledge this presentation limitation. Full-capture evaluation uses complete held-out captures, not these selected excerpts.
+
+### Connected demonstration
+
+A separate task owns WiFi and PubSubClient; a one-record latest-status queue prevents network retries from blocking inference. MQTT messages use a unique per-boot topic and carry mode, window, prediction, confirmation states and event totals. Delivery is best-effort, not a reliable event transport.
+
+Actual status was received by the Python subscriber. Six checked-in received messages were compared with the frozen host model/counters with zero prediction or confirmation differences. Seven automated tests also pass. See [evidence](evidence/README.md) for scope and reproduction.
+
+Two evidence categories must remain distinct: ACTUAL_MODEL inputs execute the classifier; SCRIPTED_TEST directly injects predictions to verify counter behaviour. Never include scripted outcomes in classifier accuracy or attack-detection metrics.
+
+### Current findings
+
+Primary test RF F1 is 0.8387 and SlowITe-window recall is 0.7222. Observed-run detection is 12/12 for k=1 and k=2, and 10/12 for k=3. Mean detected-run delay is 0.888, 3.555 and 4.900 seconds respectively. Primary clean false events are zero for every k; no primary false-alarm reduction is established.
+
+The separate held-out-capture study reveals suppression/recall/delay trade-offs. Its full tables and rate baseline are checked in; do not pool its outcomes as independent replications across environments.
+
+### Remaining work and claim limits
+
+Physical target timing/power, live packet capture, raw-record aggregation on ESP32, complete resource profiling, explicit broker-outage/recovery evidence and alternate-window sensitivity are not completed. The optional PCAP download was declined by the browser gate. The delivered contribution is an implemented, traceable embedded simulation and dataset-specific trade-off study, not proven operational protection of a live MQTT deployment.
