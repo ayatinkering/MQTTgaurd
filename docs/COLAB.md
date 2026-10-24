@@ -26,4 +26,6 @@ The archive includes source scripts and locked requirements so the training reci
 
 Colab hosting and Python/runtime availability may change. The notebook syntax and the same pipeline/packaging flow are checked locally; a fresh hosted Colab execution is not claimed until observed. The friend's older notebook had a saved successful Colab run using Python 3.13; our original local environment is Python 3.12.14.
 
+See the [local reproduction check](evidence/COLAB_LOCAL_CHECK.md) for the exact commands and verification scope. The newly generated firmware matched the already verified build byte for byte.
+
 See [research findings](RESEARCH_FINDINGS.md) for results suitable for the paper and pending experiments.
