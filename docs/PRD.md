@@ -78,6 +78,8 @@ Separate capture-held-out results show suppression with a recall/latency trade-o
 
 Delivered core: data inspection, training/evaluation, generated embedded model, Wokwi circuit/firmware, MQTT subscriber, checked-in summaries/evidence and current-version guides.
 
+The ML handoff additionally includes a fixed-version [Colab workflow](COLAB.md), classification/persistence CSVs, classification figure and a source/artifact-hashed outputs ZIP generator. The [research findings ledger](RESEARCH_FINDINGS.md) defines the report-ready results and pending evidence: matched-threshold/filter baselines, a full alarm-metric audit, continuous benign traces and independent-dataset validation. These are research extensions, not newly completed experiments.
+
 Remaining extensions are prioritized in HANDOFF: remaining broader target inputs, exhaustive network failure modes, complete linker/static-RAM report, optional 1/5-second exploratory sensitivity, raw-record aggregation and optional dashboard. Complete-clip checks, controlled connection recovery and simulator image/heap/timing evidence are delivered. The main classifier and primary test must not be retuned simply to improve final numbers.
 
 The course PDF/slides still need their proposed-software-only paragraphs replaced with the current embedded simulation description. Repository documentation supplies the correct content; it does not modify the original submitted PDF.

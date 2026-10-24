@@ -250,6 +250,8 @@ Two evidence categories must remain distinct: ACTUAL_MODEL inputs execute the cl
 
 ### Current findings
 
+Primary accuracy is 90.35% and SlowITe F1 is 83.87% for the same classifier on 570 pure-class windows, with confusion matrix `[[372,0],[55,143]]`. The Colab reproduction matches the existing fitted model and does not constitute independent-dataset validation. [Research findings](RESEARCH_FINDINGS.md) distinguishes all completed results from pending comparisons and metric audits. In particular, report clean false-event starts separately from confirmed-state occupancy on benign windows; a zero count of the former does not imply zero of the latter.
+
 Primary test RF F1 is 0.8387 and SlowITe-window recall is 0.7222. Observed-run detection is 12/12 for k=1 and k=2, and 10/12 for k=3. Mean detected-run delay is 0.888, 3.555 and 4.900 seconds respectively. Primary clean false events are zero for every k; no primary false-alarm reduction is established.
 
 The separate held-out-capture study reveals suppression/recall/delay trade-offs. Its full tables and rate baseline are checked in; do not pool its outcomes as independent replications across environments.
@@ -257,3 +259,7 @@ The separate held-out-capture study reveals suppression/recall/delay trade-offs.
 ### Remaining work and claim limits
 
 Physical target timing/power, live packet capture, raw-record aggregation on ESP32, complete linker/static-RAM profiling, exhaustive network-failure testing and alternate-window sensitivity are not completed. Simulator image/heap/timing measurements and a controlled target-resolution failure/recovery test are documented in [embedded verification](evidence/EMBEDDED_VERIFICATION.md). The optional PCAP download was declined by the browser gate. The delivered contribution is an implemented, traceable embedded simulation and dataset-specific trade-off study, not proven operational protection of a live MQTT deployment.
+
+### Colab and report artifacts
+
+[COLAB](COLAB.md) describes the fixed-source notebook and versioned handoff archive. `publish_results.py` regenerates the classification/persistence CSVs and both figures from measured JSON, checking classifier scores against confusion counts. It labels base-classifier FPR explicitly and exposes ambiguous/out-of-scope event counts. `package_ml_outputs.py` includes source scripts, locked requirements, source commit and artifact hashes. Newly regenerated firmware requires new target evidence if its source build changes. Additional filter comparisons and independent-data evaluation remain pending, not results of adopting the notebook.

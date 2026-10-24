@@ -1,6 +1,6 @@
 # Start here: MQTTGuard teammate handoff
 
-Updated 2026-10-23. This document carries the current project context so another teammate can continue without the chat.
+Updated 2026-10-24. This document carries the current project context so another teammate can continue without the chat.
 
 ## 1. What we are building now
 
@@ -51,6 +51,8 @@ python3 scripts/inspect_dataset.py
 
 Requires network for dependencies/data and a host `g++` compiler for export parity. Data acquisition uses curl. Training is small and CPU-only; no API key, GPU or model download is required. The locked environment was exercised on Linux/Python 3.12.14; other platforms need appropriate compiler/toolchain paths.
 
+For the Colab workflow, use [COLAB](COLAB.md) and the checked-in notebook. It uses a fixed repository commit and calls these same scripts. `publish_results.py` also regenerates classification/persistence CSVs and the classification figure. `package_ml_outputs.py` creates a complete versioned outputs ZIP, including source scripts and artifact hashes. The friend's supplied model/predictions matched ours exactly; retain current firmware instead of the older sketch from her ZIP. No separate experimental history model was supplied.
+
 `reports/experiment/model.joblib` is regenerated, not committed. Only load the joblib artifact created from this repository's trusted pipeline. Data/reports/virtual environments are intentionally ignored. Checked-in compact results and generated firmware let you inspect or demo without downloading the full dataset again.
 
 ## 4. Decisions already made — do not accidentally undo them
@@ -96,6 +98,8 @@ All primary clean false-event counts are zero. This capture cannot demonstrate s
 These are dataset-specific findings from one testbed/day. Run labels are proxies for actual attack timing. Simulated inference measurements are not hardware latency/power benchmarks.
 
 ## 7. Known issues and prioritized next work
+
+For the research paper, follow [RESEARCH_FINDINGS](RESEARCH_FINDINGS.md): matched operating-point baselines, a full false-start/benign-occupancy metric audit, sustained benign traffic, and independent timestamped MQTT data are the highest-value pending experiments. Current numbers establish dataset-specific tradeoffs and a working embedded simulation; they do not establish general deployment-wide suppression or algorithmic novelty. Additional tuning on already inspected captures must be labelled exploratory.
 
 1. **Course submission:** update the original report/slides/synopsis with the current architecture and measured tables. Preserve the original PDF; edit its LaTeX/source if available. The repository does not contain that source. A suggested replacement methodology paragraph appears below.
 2. **Broader target verification:** full observed serial logs and all demonstration clips are now verified. Extend to additional held-out inputs if necessary; preserve explicit build identity. Do not bypass declined PCAP permissions.

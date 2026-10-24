@@ -1,0 +1,4 @@
+k,false_events,detected_runs,total_runs,run_recall,missed_runs,mean_latency_s,median_latency_s,base_classifier_window_FPR,benign_confirmed_windows,pure_benign_windows,benign_window_exposure_hours,false_events_per_benign_window_exposure_hour,total_event_starts,ambiguous_or_out_of_scope_event_starts
+1,0,12,12,1.0,0,0.8879849166666668,0.770162,0.0,0,372,0.20666666666666667,0.0,118,64
+2,0,12,12,1.0,0,3.554651583333333,3.136271,0.0,0,372,0.20666666666666667,0.0,42,30
+3,0,10,12,0.8333333333333334,2,4.8996216,4.6682749999999995,0.0,0,372,0.20666666666666667,0.0,32,22

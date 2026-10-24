@@ -58,6 +58,8 @@ python3 scripts/inspect_dataset.py
 
 The training command generates the fitted model and replay predictions under `reports/experiment/`, summary JSON under `docs/results/`, and firmware model/replay headers. The bundle command creates the browser-friendly Wokwi files under `firmware/wokwi/`. **Regeneration does not update the online Wokwi project automatically.**
 
+For a CPU-only Colab reproduction and versioned downloadable handoff, see [Colab instructions](docs/COLAB.md). Publishing now generates classification and persistence CSVs plus a confusion-matrix figure. Locally, run `.venv/bin/python scripts/package_ml_outputs.py` after training/publishing/bundling to create a ZIP with source scripts, model, firmware, results and provenance hashes.
+
 For MQTT reception while Wokwi is running:
 
 ```bash
@@ -76,7 +78,7 @@ Primary split: train captures 1+2, validate 3, test 4. The same classifier predi
 | 2 | 0 | 12/12 | 3.555 s |
 | 3 | 0 | 10/12 | 4.900 s |
 
-Primary pure-window RF F1 is **0.8387**, with SlowITe-window recall **0.7222**. Run detection and window recall are different metrics.
+Primary pure-window RF accuracy is **90.35%**, precision **100%**, recall **72.22%** and F1 **83.87%**. Accuracy and F1 describe the same model. Run detection and window recall are different metrics. See [research findings and pending experiments](docs/RESEARCH_FINDINGS.md) for the exact report claims and limitations, including false alarm starts versus benign time spent in alarm.
 
 **This primary test does not demonstrate false-alarm reduction:** immediate alerting already has zero clean benign false events, and capture 4 has no adjacent pure-benign two-second windows. A separate capture-held-out study exposes the trade-off: on capture 1, k=2 changes clean false events from 66 to 3 while run detections change from 84/84 to 83/84. All captures come from one testbed/day.
 
@@ -99,6 +101,8 @@ The `tcp_time_delta` column repeats absolute timestamps; we recompute timing. Em
 | [Demo](docs/DEMO.md) | Repeatable presentation and troubleshooting |
 | [Status](docs/STATUS.md) | Completed work, verification and outstanding limitations |
 | [Results](docs/results/RESULTS.md) | Measured tables and plot |
+| [Research findings](docs/RESEARCH_FINDINGS.md) | Report-ready findings, claim boundaries and remaining experiments |
+| [Colab](docs/COLAB.md) | Fixed-version training notebook and complete ML handoff ZIP |
 | [Evidence](docs/evidence/README.md) | Observed Wokwi and MQTT evidence |
 | [References](docs/REPORT_REFERENCES.md) | Original bibliography and attribution corrections |
 

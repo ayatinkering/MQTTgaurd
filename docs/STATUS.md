@@ -1,6 +1,6 @@
 # MQTTGuard implementation status
 
-Updated: 2026-10-23. Core implementation, complete-clip target verification, controlled connection recovery and current-version handoff documentation complete. Follow-up experiments are listed separately.
+Updated: 2026-10-24. Core implementation, complete-clip target verification, controlled connection recovery and current-version handoff documentation complete. The friend's ML reproduction is reviewed; current Colab workflow and report metric exports are added. Follow-up research experiments are listed separately.
 
 **Live demo:** https://wokwi.com/projects/478675756306751489
 
@@ -21,6 +21,8 @@ Updated: 2026-10-23. Core implementation, complete-clip target verification, con
 - [x] Recorded simulator image size, heap and inference-time distribution, with measurement limits.
 
 ## Measured primary result
+
+Classifier accuracy is 90.35%, precision 100%, recall 72.22%, F1 83.87% on 570 pure-class windows. The friend's Colab outputs reproduce this same model, rather than a different improved classifier. See [research findings](RESEARCH_FINDINGS.md) for complete measured results and prioritized pending research, and [Colab](COLAB.md) for the adopted workflow. Original course PDFs remain unchanged; the added notebook has local syntax/pipeline checks, not a newly observed hosted Colab run.
 
 Train loops 1+2, validate loop 3, test loop 4. Selected RF: 16 trees, depth 3. Window F1: 0.8387; SlowITe-window recall: 0.7222.
 

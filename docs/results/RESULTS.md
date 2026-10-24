@@ -2,6 +2,14 @@
 
 Generated from the checked-in JSON summaries. Dataset: original MQTTEEB-D v2 captures. Labels define observed run proxies, not independently timed physical attack executions.
 
+Primary RF accuracy is **90.3509%**, SlowITe precision **100.00%**, recall **72.22%**, and F1 **83.87%**. These are different metrics of the same model.
+
+Confusion matrix (true rows / predicted columns; legitimate, SlowITe): `[[372, 0], [55, 143]]`. Scored subset: 570 pure-class windows; empty and mixed/unknown/other windows are excluded from these classification scores.
+
+Exports: [classification CSV](classification_metrics.csv), [persistence CSV](persistence_metrics.csv), and [classification figure](classification_metrics.png). `base_classifier_window_FPR` repeats the pre-confirmation classifier FPR; it is not post-confirmation FPR. Benign-window exposure sums eligible two-second windows, not independently observed continuous benign sessions. Clean false-event starts and time spent confirmed on benign windows are distinct outcomes.
+
+For report-ready findings, metric caveats and pending experiments, see [research findings](../RESEARCH_FINDINGS.md).
+
 ## Primary test: train 1+2, validate 3, test 4
 
 | Model | k | Window F1 | False clean events | Detected runs | Mean delay (s) |
