@@ -1,0 +1,267 @@
+"""Build the course LaTeX report from saved measured research artifacts."""
+import json
+from pathlib import Path
+import shutil
+
+ROOT=Path(__file__).resolve().parents[1]
+D=ROOT/'docs/research'
+
+
+def tex(value):
+    return str(value).replace('_',r'\_').replace('%',r'\%').replace('&',r'\&')
+
+
+def main():
+    data=json.loads((D/'report_data.json').read_text())
+    output=ROOT/'deliverables/report';assets=output/'assets';assets.mkdir(exist_ok=True,parents=True)
+    for name in ['matched_tradeoff.png','sensitivity.png']:
+        shutil.copyfile(D/name,assets/name)
+    shutil.copyfile(ROOT/'docs/results/classification_metrics.png',assets/'classification_metrics.png')
+    def policy_label(p):
+        if p['family']=='consecutive':return f"k={p['k']}"
+        return {'threshold':'Threshold','majority':'Majority','mean':'Moving mean','ewma':'EWMA','bounded_evidence':'Bounded evidence'}[p['family']]
+    primary=[]
+    for r in data['primary']:
+        if r['policy']['family'] in ['always_positive','ideal_pure_labels']:continue
+        primary.append(f"{policy_label(r['policy'])} & {r['benign_alarm_onsets']} & {100*r['benign_alarm_fraction']:.2f} & {r['covered_runs']}/{r['run_count']} & {r['coverage_delay_mean_s']:.3f} & {r['excluded_alarm_onsets']}" + r" \\")
+    folds=json.loads((D/'comparisons.json').read_text());matched=[]
+    for r in folds:
+        if r['split']=='fold_1' and (r['policy']=={'family':'consecutive','k':2} or r['policy']['family'] in ['threshold','bounded_evidence']):
+            matched.append(f"{policy_label(r['policy'])} & {r['benign_alarm_onsets']} & {r['benign_confirmed_windows']} & {r['covered_runs']}/{r['run_count']} & {r['coverage_delay_mean_s']:.3f}" + r" \\")
+    sensitivities=[]
+    for name in ['all4','no_keepalive','count_length','no_count','no_length','no_interarrival']:
+        values=[next(r['base_classifier']['f1'] for r in data['sensitivity'] if r['seconds']==s and r['feature_set']==name) for s in [1,2,5]]
+        sensitivities.append(tex(name)+' & '+' & '.join(f'{v:.4f}' for v in values)+r' \\')
+    content=r'''\documentclass[conference]{IEEEtran}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,booktabs,graphicx,url,array}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{assets/}}
+\title{MQTTGuard: Gap-Aware Confidence Confirmation for Embedded Detection of Slow MQTT Attacks}
+\author{\IEEEauthorblockN{Ayati Rauthan, Ireshi Rawat and Pranav Tawakley}
+\IEEEauthorblockA{Embedded System Design Lab\\Manipal Institute of Technology, Manipal, India}}
+\begin{document}
+\maketitle
+\begin{abstract}
+Machine-learning classification and operational alarm generation are different decisions in MQTT intrusion detection. MQTTGuard evaluates a compact Random Forest with immediate, consecutive, threshold, majority, averaging, exponentially weighted and bounded-evidence confirmation policies, and implements inference on a Wokwi-simulated ESP32. The proposed extension combines a bounded confidence accumulator, explicit idle-gap resets and validation-only calibration under a run-coverage constraint. The original held-out test yields 90.35\% accuracy, 72.22\% SlowITe recall and 83.87\% F1. At matched 83/84 run coverage in the first capture robustness experiment, bounded evidence reduces benign alarm occupancy by 43.75\% and mean delay by 15.19\% relative to two-window confirmation, while increasing benign onsets from three to five. It does not dominate the original primary configuration. Independent MQTTset validation covers 11,915,716 benign TCP records and a supplementary DoS scenario, with direct transfer separated from chronological adaptation. A temporal audit rejects the distributed SlowITe trace because it spans only 0.697 seconds. Real-time local benign workloads and 18 window/feature configurations complete the study. Results support a reproducible embedded tradeoff evaluation and identify important limits of alarm metrics and dataset timing.
+\end{abstract}
+\begin{IEEEkeywords}
+AIoT, MQTT, intrusion detection, SlowITe, Random Forest, ESP32, temporal confirmation
+\end{IEEEkeywords}
+
+\section{Introduction}
+The Internet of Things connects sensors, actuators and software services through networks that support monitoring and control. MQTT provides a broker-based publish--subscribe interface that is well suited to small devices and intermittent measurements. A sensor publishes observations under a topic, a broker manages subscriptions, and applications receive the relevant messages. This architecture reduces coupling between publishers and consumers, but also concentrates availability requirements at the broker and its connections. Security therefore includes protection of the communication service, rather than only protection of a sensor's application value.
+
+Artificial intelligence in IoT adds learned decisions to this communication and sensing infrastructure. An intrusion detector can learn distinctions between legitimate network behaviour and suspicious patterns, and an embedded processor can turn its prediction into an indicator, report or response. The location of this decision matters. A classifier executed near the device can operate without a continuous remote inference service, but the model and its decision state must fit a constrained runtime. Training, data preparation, runtime inference and alarm reporting should consequently be described as separate components of an AIoT system.
+
+Our application is detection of SlowITe-related MQTT traffic. Slow attacks can hold resources without the large traffic rates that make volumetric flooding easier to recognize. The original SlowITe study describes this MQTT availability threat and its interaction with connection behaviour~\cite{slowite}. A model trained on a labelled traffic dataset provides a useful experimental detector, but a positive prediction does not automatically establish a useful operational alert. Legitimate traffic changes, sparse observations, reconnects and imperfect classifications can all affect how an alarm should behave over time.
+
+This distinction motivates MQTTGuard. Immediate alerting reacts to each suspicious classification. Consecutive confirmation waits for repeated suspicious windows and therefore delays a response. Raising the probability threshold may suppress weak positives with no explicit memory. A majority vote or an average can tolerate an intervening negative observation. A bounded confidence accumulator uses the strength of repeated evidence instead of retaining only binary outcomes. Each choice trades speed, time spent falsely in alarm, number of alarm transitions and attack-run coverage. Reducing one count does not ensure improvement in the others.
+
+The research problem is to make that tradeoff measurable and executable within an embedded simulation. We investigate four questions. First, how do simple causal confirmation policies compare when their parameters are selected on validation data at a similar target coverage? Second, does reporting alarm onsets alone hide benign time spent in a confirmed state or exclude ambiguous events? Third, do the traffic representation and alarm policies remain meaningful on independent timestamped MQTT recordings and changing legitimate workloads? Fourth, what numerical consistency and implementation evidence can be obtained on a simulated ESP32?
+
+The work has three contributions. We implement a bounded, gap-aware evidence policy with validation-only coverage-constrained calibration as a modest extension to the original consecutive rule. We provide an explicit alarm audit that distinguishes current-window benign onsets, legacy all-benign evidence events, occupancy, excluded starts, run coverage and new onsets. We deliver a reproducible host-to-embedded pipeline with exact RF export, actual simulated target execution, independent MQTT status reception, external temporal-compatibility checks and a complete sensitivity study. These contributions concern the implemented combination and evaluation. They do not claim that Random Forests, sequential accumulation or consecutive alarms are new inventions.
+
+The complete project is a trace-driven AIoT simulation. Host software aggregates recorded traffic into features and trains the classifier. Wokwi executes the exported classifier and confirmation state on an ESP32, drives GPIO indicators and publishes ordinary status through MQTT. It is not a live packet sniffer, newly generated SlowITe attack or physical power benchmark. This scope allows the embedded systems course project to demonstrate real compiled inference, state handling and communication without requiring hardware.
+
+\section{Literature Survey and Research Gap}
+\subsection{MQTT attacks and public datasets}
+Vaccari, Aiello and Cambiaso introduce SlowITe as a slow denial-of-service threat against MQTT~\cite{slowite}. This establishes why a low-rate threat deserves attention even when ordinary flood-rate thresholds are insufficient. Its attack analysis is an important motivation for temporal reasoning, but the existence or duration of an attack in an experimental procedure cannot substitute for the actual timestamps in a downloaded trace. Our independent-data audit therefore distinguishes the described attack from the temporal evidence present in the distributed files.
+
+MQTTset provides raw MQTT packet captures and derived representations from an IoT testbed~\cite{mqttset}. Its strengths for our work are access to original packet timestamps and separate benign and attack recordings. Its final classification CSVs combine traffic for machine learning, which does not by itself preserve the observation sequence needed for confirmation experiments. We use the raw captures, retain file boundaries and independently validate parser output against an author-provided raw CSV. Scenario-level labels remain weaker than independently logged packet-level attack attribution. This prevents a whole attack file from being presented as an independently verified label for every packet.
+
+Aqachtoul et al. describe MQTTEEB-D, a real IoT MQTT testbed dataset containing legitimate traffic, SlowITe, DoS, malformed messages, brute force and flooding~\cite{mqtteeb}. Its original capture loops support our primary capture-separated experiment. However, the inspected release has no client identity or independent attack start/stop fields. We also find a timing field that duplicates absolute timestamps and substantial sparse-window structure. These are measured properties of the release used here. They require recomputed timing, explicit missing-value handling and careful episode terminology rather than reliance on a dataset title as a guarantee of operational ground truth.
+
+\subsection{Resource efficiency and sequential decisions}
+Gavric, Bhandari and Shalaginov investigate periodic system and network metrics for resource-efficient IoT DDoS detection~\cite{gavric}. Their time-driven approach motivates reducing inference frequency and keeping features compact. Their system metrics and experiment are different from our MQTT packet-window representation. We therefore compare implementation ideas, not headline accuracy values from incompatible datasets. MQTTGuard places the trained model and its confirmation state on a simulated microcontroller, while retaining host-side extraction as an explicit boundary.
+
+Sequential accumulation has a much older foundation. Page's continuous inspection schemes establish that repeated evidence can be accumulated to detect changes~\cite{page}. Our proposed bounded rule is inspired by that general principle, but it is not a likelihood-ratio CUSUM with its associated optimality assumptions. RF probabilities are not asserted to be calibrated likelihoods. The extension instead specifies a small bounded state, explicit resets for unavailable evidence and an empirical validation constraint. Comparing it against higher score thresholds, majority voting and averaging is essential: a more complicated memory rule cannot be justified merely by comparing it with a weak immediate baseline.
+
+\subsection{Comparative gap}
+Table~\ref{tab:literature} summarizes the relationship between the sources and this project. The identified gap is a reproducible evaluation of the post-classification decision under valid time, equivalent score inputs and multiple operational endpoints, together with a demonstrable embedded implementation. A classifier can have good window F1 while its alarm policy misses short runs. Conversely, an always-active alarm can cover every run while spending all legitimate time in alarm. Dataset time compression or missing evidence can make a temporal metric meaningless even when a confusion matrix looks plausible.
+
+The proposed methodology addresses that gap by combining score-level confirmation comparisons, explicit exposure and occupancy auditing, external capture compatibility checks, controlled legitimate traffic and actual C++ target execution. We do not claim that prior literature contains no temporal MQTT detector or no alert correlation. The contribution is narrower and testable: the specified decision-layer variant, the measured tradeoffs against several simple alternatives, and the auditable implementation and evaluation package.
+
+\begin{table*}[t]
+\caption{Critical comparison with literature. Dataset-specific accuracy values are not compared across incompatible protocols.}
+\label{tab:literature}\centering\small
+\begin{tabular}{p{2.1cm}p{3.6cm}p{4.3cm}p{5.4cm}}\toprule
+Source & Main contribution & Strength for this project & Remaining issue addressed here \\\midrule
+SlowITe~\cite{slowite} & MQTT slow-attack analysis & Defines a relevant availability threat & Downloaded trace time must still be verified \\
+MQTTset~\cite{mqttset} & Public MQTT captures and ML benchmark & Independent raw timestamped traffic & File scenarios and shuffled CSVs do not establish temporal packet labels \\
+MQTTEEB-D~\cite{mqtteeb} & MQTT testbed data with multiple attacks & Original capture loops and SlowITe records & Sparse timing, field semantics and run proxies need auditing \\
+Gavric et al.~\cite{gavric} & Time-driven compact IoT features & Resource-aware design motivation & Different features and platform preclude direct accuracy ranking \\
+Page~\cite{page} & Sequential change evidence & Established basis for accumulation & RF confidence policy needs empirical calibration and practical reset rules \\
+MQTTGuard & Bounded confirmation and embedded evaluation & Common scores, complete alarm audit and compiled ESP32 demo & Explicit transfer, timing and simulation limits remain \\\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Proposed Methodology}
+\subsection{Architecture and observation unit}
+Figure~\ref{fig:architecture} separates host processing, embedded execution and reporting. The host prepares the dataset, fits the imputer and RF on training captures, chooses the model and decision parameters on validation data, and exports constants and C++ functions. Offline full-capture replay provides research metrics. Short label-free feature clips demonstrate actual embedded execution. MQTT telemetry reports the computed decision; it is not the traffic source used to reconstruct TCP features.
+
+\begin{figure}[t]\centering
+\begin{tikzpicture}[node distance=4mm, every node/.style={font=\footnotesize}, box/.style={draw,rounded corners=1mm,align=center,text width=7cm,minimum height=7mm}, >=Latex]
+\node[box] (data) {Original captures and independent PCAP audit};
+\node[box,below=of data] (host) {Host windows, training-only preprocessing and RF fitting};
+\node[box,below=of host] (export) {Validation-only policy calibration and verified C++ export};
+\node[box,below=of export] (edge) {Wokwi ESP32 classifier and causal confirmation state};
+\node[box,below=of edge] (output) {GPIO indicators and MQTT status to independent subscriber};
+\draw[->] (data)--(host);\draw[->](host)--(export);\draw[->](export)--(edge);\draw[->](edge)--(output);
+\end{tikzpicture}
+\caption{Implemented AIoT architecture. Full held-out traces support research scoring; short validation clips support target execution checks.}\label{fig:architecture}
+\end{figure}
+
+An observation is a complete half-open time window, anchored at the first timestamp of its original capture. For duration $\Delta$ and origin $t_0$, packet $i$ enters $j=\lfloor(t_i-t_0)/\Delta\rfloor$. Timestamps are parsed as exact integer microseconds. Trailing incomplete windows are excluded. Empty intervals remain in the sequence, with no classifier call and an explicit reset. Separate files are never made artificially adjacent; a boundary resets the policy without manufacturing legitimate examples.
+
+The primary study uses $\Delta=2$ seconds and the original MQTTEEB-D loops. Their union contains 222,813 records: 17,557 legitimate, 20,090 SlowITe, 41,802 DoS, 105,528 malformed, 27,377 brute force, 10,213 flood and 246 missing labels. The cleaned file equals the raw union and is not added again. Only pure legitimate and pure SlowITe windows enter fitting and primary classification scoring. Other or mixed windows remain available at runtime and are separately audited rather than relabelled benign.
+
+\subsection{Features and classifier}
+Each valid window has four features:
+\begin{equation}
+\mathbf{x}_j=\left[n_j,\;\overline{\ell}_j,\;\overline{\delta}_j,\;\overline{k}_j\right],
+\end{equation}
+where $n_j$ is observation count, $\overline{\ell}_j$ is mean TCP payload length, $\overline{\delta}_j$ is mean within-window timestamp gap, and $\overline{k}_j$ is mean recorded MQTT keepalive metadata. For $n_j>1$, $\overline{\delta}_j=(t_{\max}-t_{\min})/(n_j-1)$. A singleton's gap is missing rather than an invented zero. The imputer learns medians using training captures only. Recorded keepalive values outside CONNECT are default zero in the representation; they must not be interpreted as continuously negotiated connection settings.
+
+The primary split trains on captures1+2, validates on3 and tests on4. The candidate RF grid has8/16 trees and maximum depth3/5, minimum leaf size2, balanced class weights and seed42. Selection maximizes validation F1, breaking ties by fewer nodes, trees and depth. The selected model has16 trees and depth3. Tree inputs are float32, thresholds and leaf probabilities retain the learned precision, and prediction uses the RF's averaged class probability $p_j>0.5$. The C++ export preserves soft voting, not a hard vote over tree labels.
+
+We also retain the original traffic-count baseline and four separately fitted robustness folds. In fold $i$, capture$i$ is test, the next capture cyclically is validation, and the remaining two are training. They test sensitivity to capture partitions within one testbed/day. They are not four independent deployments and cannot support a claim of site-independent generalization.
+
+\subsection{Bounded gap-aware evidence}
+The proposed decision layer maintains evidence $e_j$ with bound $h>0$ and decay $d$:
+\begin{equation}
+\begin{aligned}e_j &= \min\{h,\max[0,d e_{j-1}+p_j-0.5]\},\\ a_j &= \mathbf{1}(e_j\ge h).\end{aligned}
+\end{equation}
+Unavailable input or a missing ID clears the evidence. Duplicate or older IDs do not advance state. An alarm event occurs only on an inactive-to-active transition. The bounded state prevents unlimited confidence accumulated in a long run from requiring an unbounded recovery period. The decay controls how much prior evidence remains. The rule is causal: later observations cannot change an earlier decision.
+
+The configuration grid uses $h\in\{0.1,0.25,0.5,0.75,1.0\}$ and $d\in\{0.5,0.8,1.0\}$. The selected primary setting is $h=0.75,d=0.5$. We implement the same arithmetic in a shared C++ module, with configuration, counters and ID tracking occupying40 bytes in the measured host and ESP32 builds. This is a small decision state, not the size of the RF or the entire application.
+
+\subsection{Comparators and fair calibration}
+The fixed references are immediate alerts and two/three consecutive scores above0.5. Other families are raised thresholds0.50 to0.95 in0.05 steps plus0.975/0.99; causal majority votes over3/5 contiguous valid windows; moving means over3/5 windows with thresholds0.5/0.6/0.7/0.8/0.9; and EWMA with alpha0.25/0.5/0.75 and the same threshold grid. Moving-history policies require a full valid history. Every family sees the same frozen classifier scores and the same gap boundaries.
+
+Parameters are selected only on validation data. The required validation run coverage is at least the fixed k2 validation coverage minus0.02. Among feasible candidates, selection minimizes benign confirmed-window fraction, then benign onset count, then mean coverage delay, with a deterministic parameter tie break. When no candidate meets the constraint, the maximum attainable coverage is selected and that failure is recorded. Test coverage is not guaranteed by validation matching. All fixed references, selected policies and descriptive test frontiers are retained, including poor results. An always-positive policy and an ideal-pure-label policy diagnose metric opportunity and are excluded from trained-model rankings.
+
+\subsection{Alarm audit and run definitions}
+Version2 of the alarm audit reports base window confusion, current-window benign onsets, positive onsets, excluded onsets, benign alarm duration, eligible benign exposure, coverage misses and latency. Benign occupancy is
+\begin{equation}
+O_B=\frac{\sum_j\mathbf{1}(y_j=0)a_j\Delta}{\sum_j\mathbf{1}(y_j=0)\Delta}.
+\end{equation}
+This differs from counting only starts. A state may begin during another class and remain active on a benign window without creating a new benign onset. The legacy clean-false-event metric requires all k supporting windows to be pure benign; it remains available under its original name and is not confused with either current-window onsets or occupancy.
+
+Ground-truth consecutive SlowITe labels define observed run proxies. Coverage requires an active pure-SlowITe window whose end falls within the run's observed start/end interval. New-onset recall separately requires a new transition during that interval. Delay is the first qualifying window end minus the run start, reported only among covered runs with mean, median and95th percentile. We report misses because a conditional mean can improve simply by dropping hard runs. The audit's stricter pure-window condition changes the primary immediate mean from legacy0.888 to1.055 seconds; it does not change the classifier.
+
+\subsection{External data and legitimate workloads}
+The fixed extended protocol is saved before external scoring. Its metadata-driven amendment records the rejection of MQTTset's SlowITe file and the addition of a supplementary DoS scenario. Independent PCAP extraction supports Ethernet and Linux cooked IPv4 TCP captures to/from the MQTT broker port. TCP payload length uses IP/TCP header lengths. Fragmented CONNECT keepalive metadata is attributed to the completing segment, matching the source CSV. All9,202 SlowITe CSV records match extracted timestamps, lengths and keepalive values exactly. Twenty-three timestamp inversions in the benign file are aggregated by their real times, without compressing or inventing intervals.
+
+External direct transfer first freezes the original model and its primary-validation-selected policies. Separately, within-MQTTset adaptation uses the first40\% of each compatible file for training, the next20\% for validation and the last40\% for testing, with five-second guards around split boundaries. File-level attack labels support scenario-level evaluation, not verified per-packet SlowITe recall. Direct transfer and adaptation are different experiments and remain separate in every table.
+
+The legitimate stress experiment records24 concurrent Paho clients for120 real seconds against a local publisher/keepalive MQTT broker. Six profiles, each with four fixed seeds, cover steady publishing, bursts, reconnects, rate changes, idle and combined behaviour. Loopback packet capture records actual timestamps; no clock acceleration is used. The global aggregate matches a network-wide observation scope. Per-client feature streams are additional profile diagnostics with narrower scope, not independent physical-device deployments. A compressed capture and session manifest support exact replay without requiring another privileged capture.
+
+Finally, sensitivity uses1/2/5-second windows and six feature sets: all four, no keepalive, count+length, no count, no length and no interarrival. Each of the18 configurations repeats training/validation selection and retains the original held-out test. Since original results were already inspected, this is exploratory sensitivity, not a new untouched test or a licence to select the best test configuration as the final model.
+
+\section{Implementation and Verification}
+The ESP32 application performs actual RF inference and updates parallel k1/2/3 and bounded-evidence states. Timed replay preserves original source IDs, empty intervals and missing-feature masks. Buttons select traces, pause/replay and switch to explicitly labelled scripted tests. Scripted tests inject predictions to check state behaviour and never contribute classifier accuracy. The fourth green LED exposes bounded evidence, while serial output reports the evidence value, confirmed flag, accepted ID and event total.
+
+A separate FreeRTOS task owns WiFi and PubSubClient. A one-record overwrite queue keeps reporting retries from blocking inference. Status messages carry ordinary computed predictions and confirmation state through a unique per-boot topic. Best-effort QoS0 status is not reliable delivery of every event. A Python subscriber independently verifies received outputs. A controlled failed-hostname diagnostic tests one network failure/recovery path without attacking a public broker.
+
+Host export verification compares Python and C++ over11,210 inputs, including321 threshold-boundary cases, with zero label disagreements and maximum probability difference0.0. The actual C++ evidence module is additionally checked over2,721,252 saved score-policy transitions, with zero active-state/event discrepancies and explicit duplicate, gap and unavailable-input cases. Twenty automated tests check window boundaries, filters, occupancy versus onset distinctions, parser framing and original firmware evidence. Full score parity on a host is distinguished from actual target coverage in Wokwi.
+
+The original Wokwi build has90 observed MODEL rows across complete passes of all three clips, with zero prediction/probability/state discrepancies. It reports a928,112-byte full firmware image, minimum observed free heap214,952 bytes and median/p95 simulated model-call times140/147 microseconds over53 calls. Those figures belong to that identified original build, not automatically to the extended build. The extended build 3f718dc4c8d9ea81 has 62 observed MODEL/evidence rows, complete passes of all three clips, and 53 independently received MQTT records, with zero prediction or state discrepancies. Its image is 928,912 bytes, the policy object is 40 bytes, and the observed minimum heap is 211,168 bytes. These new observations are saved separately from the original build. The research demo is available at \url{https://wokwi.com/projects/478737844363875329}. Simulator timings are not physical-chip measurements and exclude full feature extraction and end-to-end response time.
+
+\section{Results}
+\subsection{Primary classifier and alert policies}
+The original classifier's confusion matrix is $[[372,0],[55,143]]$: all372 pure legitimate windows are correctly classified, while55 of198 SlowITe windows are missed. Accuracy is90.35\%, precision100\%, recall72.22\% and F1 is83.87\%. These are different metrics of one model. The count baseline's F1 is71.84\%. The scored cohort contains570 pure-class windows; the capture also contains2,575 empty and582 mixed/unknown/other complete windows, for3,727 total. Excluding those categories from classification scores does not remove them from runtime or the alarm audit.
+
+Table~\ref{tab:primary} gives the complete selected-policy comparison. The primary k2 rule covers12/12 runs with mean delay3.555 seconds, while k3 covers10/12 with4.900 seconds among covered runs. The proposed primary setting covers11/12 with5.251 seconds. It does not improve the original primary operating point. A raised threshold covers12/12 but delays to4.055 seconds; majority voting covers12/12 with4.555 seconds. Thus a memory-based extension is not automatically preferable to a simple threshold or a consecutive rule.
+
+\begin{table*}[t]\caption{Primary selected-policy comparison using audit version2. Occupancy is percent of eligible pure-benign time; excluded onsets are retained separately.}\label{tab:primary}\centering\small
+\begin{tabular}{lrrrrr}\toprule
+Policy & Benign onsets & Occupancy \% & Covered runs & Mean delay s & Excluded onsets \\\midrule
+@PRIMARY@
+\bottomrule\end{tabular}\end{table*}
+
+All selected primary policies have zero benign occupancy, but this capture has no adjacent pure-benign windows. The legacy clean-false-start metric is therefore structurally zero for k at least2. The always-positive diagnostic nevertheless yields372 benign onsets and100\% benign occupancy, making clear that the broader audit does not certify an always-on detector. Reporting only the legacy zero would hide this distinction. The primary has substantial excluded event starts, which cannot be silently interpreted as verified detections.
+
+\subsection{Matched coverage tradeoff}
+Capture1 provides a useful nonzero false-alarm comparison at83/84 covered runs. Table~\ref{tab:matched} compares k2, a validation-selected threshold of0.99 and bounded evidence with $h=0.5,d=0.5$. The proposed policy has nine benign confirmed windows compared with16 for k2, corresponding to43.75\% lower benign occupancy. Mean delay decreases from3.172 to2.690 seconds, or15.19\%. However, benign onsets rise from three to five. The threshold also has five onsets, only five benign confirmed windows and a3.001-second mean delay. Consequently the proposed rule offers a faster response at this coverage with an occupancy cost relative to the threshold, while k2 has fewer starts. The complete project identifies this Pareto tradeoff rather than claiming universal dominance.
+
+\begin{table}[t]\caption{Capture1 comparison at83/84 covered runs.}\label{tab:matched}\centering\footnotesize
+\begin{tabular}{lrrrr}\toprule
+Policy & Benign starts & Benign windows & Runs & Delay s \\\midrule
+@MATCHED@
+\bottomrule\end{tabular}\end{table}
+
+The other folds remain in the saved audit. The original legacy clean-event results for k1/k2/k3 are66/3/3,16/0/0,10/0/0 and0/0/0 across captures1--4. Audit version2 additionally shows that capture2 has two benign confirmed windows at k2 despite zero legacy clean false starts. These observations establish why onset suppression, false-state duration and coverage must be interpreted together. We do not pool the folds as independent sites or calculate confidence intervals by treating correlated windows as independent trials.
+
+\begin{figure*}[t]\centering\includegraphics[width=.78\textwidth]{matched_tradeoff.png}\caption{Measured capture1 tradeoff at equal83/84 coverage. Smaller occupancy and delay are preferable, while the table retains the separate onset count.}\label{fig:tradeoff}\end{figure*}
+
+\subsection{Independent temporal validation}
+The independent benign MQTTset capture contains11,915,716 TCP records and302,551 complete two-second windows, representing605,102 seconds of observed benign exposure. The frozen primary model yields zero benign alarms over that capture for the evaluated policies. This is stronger benign exposure evidence than the sparse primary capture, but it does not demonstrate detection of external attacks.
+
+The distributed SlowITe PCAP contains9,202 packets spanning only0.696832 seconds. Both its PCAP and the author CSV agree. It supplies zero complete two-second windows, so it is excluded from temporal scoring without stretching its timebase. The separate supplementary DoS recording spans126.849502 seconds and supplies63 complete windows. Direct transfer with immediate alerts covers the single scenario after28 seconds, while k2/k3 and the primary selected bounded policy do not cover it. This is an external transfer failure of stricter confirmation, retained as a finding.
+
+Within-MQTTset chronological adaptation yields a scenario-window test confusion matrix $[[121017,0],[0,22]]$. In that separately fitted experiment, the adapted model correctly separates the retained benign and DoS test windows. Its immediate and bounded rules cover the one retained DoS test segment with3.4-second boundary-relative delay; k2/k3 require5.4/7.4 seconds. The perfect classification is limited by extremely strong file/scenario separation and one original attack recording. The22 positive windows are not22 independent attacks, and the result is not100\% general SlowITe detection. Scenario-cut delays start at the retained test segment boundary and are not physical attack-onset measurements.
+
+\subsection{Continuous benign stress}
+The controlled workload produces2,335 legitimate publishes from24 concurrent clients. The aggregate contains60 complete two-second windows. The frozen original model has zero benign alarm windows on that aggregate and all retained per-client diagnostics. The externally adapted classifier produces one aggregate benign alarm window with immediate or bounded confirmation; k2 suppresses it. Across the1,219 eligible per-client benign windows, adapted k2 confirms74 windows with57 starts, while the adapted bounded rule confirms264 with190 starts. These narrower-scope stress results reveal sensitivity to observation scope and calibration domain even when the adapted test confusion matrix is perfect.
+
+This experiment therefore supports two concrete conclusions. The original frozen model remains quiet under the recorded legitimate profiles, and strong performance on separate benign/attack files does not ensure low alarms when rate, reconnect and aggregation conditions change. The proposed evidence rule cannot be recommended as universally safer than k2 based on its favourable capture1 delay alone.
+
+\subsection{Window and feature sensitivity}
+Table~\ref{tab:sensitivity} and Fig.~\ref{fig:sensitivity} retain all18 configurations. All-four-feature F1 is0.8830,0.8387 and0.4026 at1/2/5 seconds. Removing recorded keepalive gives0.8893,0.8455 and0.4054. At five seconds, removing count instead yields0.8357, indicating strong interaction between count and window duration. At two seconds, retaining only count and length drops F1 to0.5118. Neither the four-feature set nor the original duration can be described as universally essential or optimal.
+
+All configurations' k2 rules cover12/12 run proxies in this primary capture, even when window F1 is poor. This reinforces the need to retain window scores and alarm occupancy alongside run coverage. Differences in duration also change which windows are pure, mixed or complete, so the F1 values are not paired predictions on an identical cohort. No official replacement model is chosen from the best observed test F1.
+
+\begin{table}[t]\caption{Exploratory SlowITe F1 by feature set and window duration.}\label{tab:sensitivity}\centering\small
+\begin{tabular}{lrrr}\toprule
+Feature set & 1 s & 2 s & 5 s \\\midrule
+@SENSITIVITY@
+\bottomrule\end{tabular}\end{table}
+\begin{figure*}[t]\centering\includegraphics[width=.95\textwidth]{sensitivity.png}\caption{Complete prespecified sensitivity grid. These additions use already inspected original captures and are exploratory.}\label{fig:sensitivity}\end{figure*}
+
+\section{Discussion and Threats to Validity}
+The study's strongest methodological finding is that an alarm policy cannot be judged by a single false-event total. A policy that holds an alarm for longer may create fewer transitions but burden more benign time. A policy may obtain perfect coverage by remaining active. Sparse legitimate windows can eliminate opportunities for a clean consecutive false event, and excluded event categories can dominate the reported starts. MQTTGuard's complete audit keeps these quantities visible instead of allowing a zero to stand for general reliability.
+
+The bounded-evidence extension has a measurable benefit at one matched-coverage operating point, but it also has clear failures. It misses a primary run covered by k2, responds more slowly on that primary split, and is more aggressive than k2 under the adapted per-client legitimate stress. These outcomes are part of the completed project, not omitted exceptions. The practical default remains the original simple reference until a deployment-specific validation corpus justifies a different decision rule. A useful research contribution may characterize the conditions of an improvement rather than guarantee that a new rule wins every metric.
+
+External-data validity remains a central constraint. The independent SlowITe trace cannot support our chosen temporal window, whereas a DoS scenario can. The benign week supplies substantial independent negative exposure. Neither substitutes for independently timed external SlowITe executions. Future confirmation of transfer would require new appropriately timed attack sessions, multiple days or sites, known start/stop logs and an observation schema aligned with deployment. The absence of those data is reported explicitly; no synthetic packet chronology is used to manufacture it.
+
+Label-run delays are also weaker than physical attack response times. The original dataset does not identify independent execution boundaries. Mixed and incomplete windows, onset attribution and ongoing alarms affect whether a run is credited. We preserve both legacy and version2 definitions so an apparent improvement cannot be created merely by changing the denominator. The external adaptation uses temporal guards, but its training and testing still share original files; it is adaptation within a source corpus rather than independent-site validation.
+
+The computational evidence is similarly bounded. C++ parity verifies numerical and state semantics under the tested compiler and saved inputs. Wokwi verifies compiled firmware, GPIO behaviour and actual status communication for demonstration clips. Neither establishes physical power consumption, interrupt timing, packet-capture capacity or protection of a live attacked broker. Model-call timing excludes preprocessing, serialization and delivery. Best-effort MQTT can drop intermediate status during a fault, which is compatible with the latest-snapshot design but not with reliable event logging.
+
+Reproducibility is addressed through input hashes, protocol and amendment files, source revision, retained parameter frontiers, generated tables and figures, recorded packet fixtures, build fingerprints and observed serial/MQTT evidence. The Colab notebook reproduces the original fixed implementation; the extended scripts reproduce this study from its recorded inputs. AI-assisted tooling supported coding and drafting, with results generated by executable scripts and checked against stored numerical and target evidence~\cite{skills}. A hosted notebook run, institutional similarity report or hardware test is not claimed unless actually performed.
+
+\section{Conclusion}
+MQTTGuard implements and evaluates an embedded MQTT intrusion-detection pipeline with explicit separation of classification, temporal confirmation and reporting. The compact primary RF achieves83.87\% SlowITe F1. The proposed bounded confidence policy changes the delay--occupancy tradeoff at matched coverage, including43.75\% less benign occupancy and15.19\% less mean delay than k2 in capture1, with more onsets. It does not dominate the primary k2 configuration. Independent benign exposure, a supplementary external DoS test, real-time legitimate workloads and18 sensitivity runs expose timing, transfer and aggregation limits that a single confusion matrix would miss. The delivered ESP32 simulation, shared C++ policy and reproducible audit provide a complete course implementation and a measured basis for the research report. Further deployment claims require independent, adequately timed SlowITe executions and physical or live-network validation.
+
+\begin{thebibliography}{9}
+\bibitem{slowite} I. Vaccari, M. Aiello and E. Cambiaso, ``SlowITe, a novel denial of service attack affecting MQTT,'' \emph{Sensors}, vol.20, no.10, art.2932,2020, doi:10.3390/s20102932.
+\bibitem{mqttset} I. Vaccari, G. Chiola, M. Aiello, M. Mongelli and E. Cambiaso, ``MQTTset, a new dataset for machine learning techniques on MQTT,'' \emph{Sensors}, vol.20, no.22, art.6578,2020, doi:10.3390/s20226578.
+\bibitem{mqtteeb} A. Aqachtoul, K. Karam, A. Elamrani, M. Najib, N. Rafalia and M. Bakhouya, ``MQTTEEB-D: A real-world IoT cybersecurity dataset for AI-powered threat detection in MQTT networks,'' \emph{Data in Brief}, vol.62, art.111897,2025, doi:10.1016/j.dib.2025.111897. Data release: doi:10.17632/jfttfjn6tr.2.
+\bibitem{gavric} N. Gavric, G. P. Bhandari and A. Shalaginov, ``Towards resource-efficient DDoS detection in IoT: Leveraging feature engineering of system and network usage metrics,'' \emph{Journal of Network and Systems Management}, vol.32, art.69,2024, doi:10.1007/s10922-024-09848-2.
+\bibitem{page} E. S. Page, ``Continuous inspection schemes,'' \emph{Biometrika}, vol.41, no.1--2, pp.100--115,1954, doi:10.1093/biomet/41.1-2.100.
+\bibitem{skills} T. Kassis, V. Agarwal, Y. He, D. Patel and A. M. Brueckner, ``Scientific Agent Skills: A library of procedural knowledge for research agents,'' arXiv:2609.00065,2026, doi:10.48550/arXiv.2609.00065. Software-development guidance, not detection-effectiveness evidence.
+\end{thebibliography}
+\end{document}
+'''
+    content=content.replace('@PRIMARY@','\n'.join(primary)).replace('@MATCHED@','\n'.join(matched)).replace('@SENSITIVITY@','\n'.join(sensitivities))
+    # Space numeric prose while keeping identifiers, equations and reference keys literal.
+    import re
+    protected = []
+    pattern = r"\\begin\{(?:equation|tikzpicture)\}.*?\\end\{(?:equation|tikzpicture)\}|\$[^$]+\$|\\(?:label|ref|cite|url)\{[^}]+\}|[0-9a-f]{16}|(?:doi:|arXiv:)[^\s]+|ESP32|float32|IPv4|F1|MQTT3|p95|k[123]"
+    def protect(match):
+        protected.append(match.group())
+        return f"@@TOKEN_{len(protected)-1}@@"
+    content = re.sub(pattern, protect, content, flags=re.S)
+    content = re.sub(r'(?<=[a-zA-Z])(?=\d)', ' ', content)
+    for index, value in enumerate(protected):
+        content = content.replace(f"@@TOKEN_{index}@@", value)
+    content=content.replace('vol.','vol. ').replace('art.','art. ').replace('pp.','pp. ')
+    (output/'main.tex').write_text(content)
+    print('Generated measured LaTeX report:',output/'main.tex')
+
+
+if __name__=='__main__':main()

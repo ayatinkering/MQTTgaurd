@@ -1,5 +1,18 @@
 # MQTTGuard PRD — Current ESP32/Wokwi Version
 
+## Completed research extension — 24 October 2026
+
+The stronger-policy comparisons, audit version 2, continuous legitimate workload, independent MQTTset compatibility/direct-transfer/adaptation tests, and all 18 feature/window sensitivity configurations are complete. Read the [editable report content](../deliverables/report/REPORT_CONTENT.md) for the full paper narrative and [measured extended results](research/RESULTS.md) for tables. The original results below remain a historical baseline; legacy delays and clean false-event counts must not be mixed with audit-v2 endpoints.
+
+The new contribution is bounded gap-aware confidence accumulation with validation-only coverage-constrained calibration, implemented in C++. It is a modest application-specific extension to established sequential evidence methods. At matched 83/84 coverage in capture 1 it reduces benign occupancy 43.75% and mean delay 15.19% relative to k=2, while increasing benign starts from 3 to 5. It underperforms k=2 on the primary split; no universal advantage is claimed.
+
+The [research Wokwi demo](https://wokwi.com/projects/478737844363875329) uses `firmware/wokwi_research/`, build `3f718dc4c8d9ea81`, and adds a fourth evidence LED. Actual verification covers 62 paired model/evidence rows and 53 independently received MQTT records, with zero discrepancies. Original firmware and its demo remain available as the fixed baseline.
+
+MQTTset supplies substantial independent benign exposure and a supplementary DoS scenario. Its SlowITe file spans only 0.696832 seconds and cannot validate two-second temporal detection. Separate adaptation has perfect scenario-window test classification but false alarms under changed benign scope; it is not general 100% SlowITe detection. All these outcomes are retained.
+
+Only editable report content is requested now. Slides and synopsis production are stopped; the original course PDFs are unchanged.
+
+
 Updated 2026-10-23. This replaces the earlier host-only scope. Read [STATUS](STATUS.md) for verification and [HANDOFF](HANDOFF.md) to continue development.
 
 ## 1. Purpose and audience
@@ -18,10 +31,10 @@ Deliver a demonstrable Embedded Systems + AIoT course project investigating ligh
 | Model | Validation-selected RF, currently 16 trees/depth 3, exported to C++ |
 | Embedded target | ESP32 DevKit simulated in Wokwi, Arduino C++ |
 | Input to firmware | Precomputed chronological feature windows stored with firmware |
-| Decision | On-device RF inference plus parallel k=1,2,3 state machines |
-| Outputs | Three LEDs, buzzer, serial logs and MQTT status |
+| Decision | On-device RF inference, k=1,2,3 references and separate bounded-evidence research variant |
+| Outputs | Three baseline LEDs; research variant adds fourth evidence LED; buzzer, serial and MQTT status |
 | Networking | Public broker, independent Python subscriber, separate network task |
-| Research | Primary test, rate baseline, capture-held-out robustness and ideal-label diagnostic |
+| Research | Primary and four robustness folds; stronger policies, full audit, external MQTTset, benign stress and 18 sensitivity runs |
 
 Live packet capture, actual broker exhaustion, physical hardware, on-device raw feature extraction, automatic blocking, ThingsBoard and cloud dashboards are outside this version. Do not describe replayed features as live traffic observations. Sensors are not required by this IDS architecture.
 
@@ -78,8 +91,6 @@ Separate capture-held-out results show suppression with a recall/latency trade-o
 
 Delivered core: data inspection, training/evaluation, generated embedded model, Wokwi circuit/firmware, MQTT subscriber, checked-in summaries/evidence and current-version guides.
 
-The ML handoff additionally includes a fixed-version [Colab workflow](COLAB.md), classification/persistence CSVs, classification figure and a source/artifact-hashed outputs ZIP generator. The [research findings ledger](RESEARCH_FINDINGS.md) defines the report-ready results and pending evidence: matched-threshold/filter baselines, a full alarm-metric audit, continuous benign traces and independent-dataset validation. These are research extensions, not newly completed experiments.
+The ML handoff includes the fixed-source original Colab workflow and a source/artifact-hashed ZIP generator. Completed research additions include matched threshold/filter alternatives, audit-v2 metrics, recorded benign stress, independent MQTTset compatibility/direct transfer/adaptation and all 18 sensitivity configurations. Their deliverable is the editable report and saved machine-readable results linked above.
 
-Remaining extensions are prioritized in HANDOFF: remaining broader target inputs, exhaustive network failure modes, complete linker/static-RAM report, optional 1/5-second exploratory sensitivity, raw-record aggregation and optional dashboard. Complete-clip checks, controlled connection recovery and simulator image/heap/timing evidence are delivered. The main classifier and primary test must not be retuned simply to improve final numbers.
-
-The course PDF/slides still need their proposed-software-only paragraphs replaced with the current embedded simulation description. Repository documentation supplies the correct content; it does not modify the original submitted PDF.
+Optional future work includes broader independent sessions, physical measurements, exhaustive fault cases, live target extraction and a dashboard. Original PDFs are preserved. The user will adapt the supplied report content; slides and synopsis are not requested.

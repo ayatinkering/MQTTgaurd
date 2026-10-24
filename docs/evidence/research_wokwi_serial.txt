@@ -1,0 +1,225 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1156
+load:0x40078000,len:11456
+ho 0 tail 12 room 4
+load:0x40080400,len:2972
+entry 0x400805dc
+BUILD=3f718dc4c8d9ea81
+EVIDENCE_POLICY h=0.75 decay=0.5 bytes=40
+MQTTGuard RF 16 trees / depth 3 | dataset replay, not live packet capture
+TOPIC=mqttguard/mqg-00c40a24-0d9245e7/status
+heap=289452 bytes
+GPIO25 next, GPIO26 pause/replay, GPIO27 scripted/AI
+SCENARIO mode=ACTUAL_MODEL clip=SLOWITE TRACE capture=3; original window IDs preserved
+MODEL window=712 pred=0 probability=0.351129 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=120
+EVIDENCE window=712 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=3196
+MQTT_SENT window=712
+MODEL window=713 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=713 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=713
+MODEL window=714 pred=1 probability=0.911515 accepted=1 streak=1/1/1 confirmed=1/0/0 events=1/0/0 inference_us_simulated=34
+EVIDENCE window=714 value=0.411514720 confirmed=0 events=0 accepted=1
+MQTT_SENT window=714
+MODEL window=715 pred=1 probability=0.911515 accepted=1 streak=1/2/2 confirmed=1/1/0 events=1/1/0 inference_us_simulated=34
+EVIDENCE window=715 value=0.617272080 confirmed=0 events=0 accepted=1
+MQTT_SENT window=715
+MODEL window=716 pred=1 probability=0.983068 accepted=1 streak=1/2/3 confirmed=1/1/1 events=1/1/1 inference_us_simulated=34
+EVIDENCE window=716 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=716
+MODEL window=717 pred=1 probability=0.983068 accepted=1 streak=1/2/3 confirmed=1/1/1 events=1/1/1 inference_us_simulated=34
+EVIDENCE window=717 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=717
+MODEL window=718 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=1/1/1 inference_us_simulated=0
+EVIDENCE window=718 value=0.000000000 confirmed=0 events=1 accepted=1
+MQTT_SENT window=718
+MODEL window=719 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=1/1/1 inference_us_simulated=0
+EVIDENCE window=719 value=0.000000000 confirmed=0 events=1 accepted=1
+MQTT_SENT window=719
+SCENARIO mode=ACTUAL_MODEL clip=BENIGN TRACE capture=3; original window IDs preserved
+MODEL window=0 pred=0 probability=0.138770 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=128
+EVIDENCE window=0 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=0
+MODEL window=1 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=1 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=1
+MODEL window=2 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=2 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=2
+MODEL window=3 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=3 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=3
+MODEL window=4 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=4 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=4
+MODEL window=5 pred=0 probability=0.138770 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=128
+EVIDENCE window=5 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=5
+MODEL window=6 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=6 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=6
+MODEL window=7 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=7 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=7
+MODEL window=8 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=8 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=8
+MODEL window=9 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=9 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=9
+MODEL window=10 pred=0 probability=0.138770 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=128
+EVIDENCE window=10 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=10
+MODEL window=11 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=11 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=11
+MODEL window=12 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=12 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=12
+MODEL window=13 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=13 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=13
+MODEL window=14 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=14 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=14
+MODEL window=15 pred=0 probability=0.138770 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=128
+EVIDENCE window=15 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=15
+MODEL window=16 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=16 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=16
+MODEL window=17 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=17 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=17
+SCENARIO mode=ACTUAL_MODEL clip=SLOWITE TRACE capture=3; original window IDs preserved
+MODEL window=712 pred=0 probability=0.351129 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=120
+EVIDENCE window=712 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=712
+MODEL window=713 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=0/0/0 inference_us_simulated=0
+EVIDENCE window=713 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=713
+MODEL window=714 pred=1 probability=0.911515 accepted=1 streak=1/1/1 confirmed=1/0/0 events=1/0/0 inference_us_simulated=142
+EVIDENCE window=714 value=0.411514720 confirmed=0 events=0 accepted=1
+MQTT_SENT window=714
+MODEL window=715 pred=1 probability=0.911515 accepted=1 streak=1/2/2 confirmed=1/1/0 events=1/1/0 inference_us_simulated=142
+EVIDENCE window=715 value=0.617272080 confirmed=0 events=0 accepted=1
+MQTT_SENT window=715
+MODEL window=716 pred=1 probability=0.983068 accepted=1 streak=1/2/3 confirmed=1/1/1 events=1/1/1 inference_us_simulated=140
+EVIDENCE window=716 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=716
+MODEL window=717 pred=1 probability=0.983068 accepted=1 streak=1/2/3 confirmed=1/1/1 events=1/1/1 inference_us_simulated=140
+EVIDENCE window=717 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=717
+MODEL window=718 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=1/1/1 inference_us_simulated=0
+EVIDENCE window=718 value=0.000000000 confirmed=0 events=1 accepted=1
+MQTT_SENT window=718
+MODEL window=719 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=1/1/1 inference_us_simulated=0
+EVIDENCE window=719 value=0.000000000 confirmed=0 events=1 accepted=1
+MQTT_SENT window=719
+MODEL window=720 pred=1 probability=0.704975 accepted=1 streak=1/1/1 confirmed=1/0/0 events=2/1/1 inference_us_simulated=123
+EVIDENCE window=720 value=0.204974651 confirmed=0 events=1 accepted=1
+MQTT_SENT window=720
+MODEL window=721 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=2/1/1 inference_us_simulated=0
+EVIDENCE window=721 value=0.000000000 confirmed=0 events=1 accepted=1
+MQTT_SENT window=721
+MODEL window=722 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=2/1/1 inference_us_simulated=0
+EVIDENCE window=722 value=0.000000000 confirmed=0 events=1 accepted=1
+MQTT_SENT window=722
+MODEL window=723 pred=0 probability=0.351129 accepted=1 streak=0/0/0 confirmed=0/0/0 events=2/1/1 inference_us_simulated=120
+EVIDENCE window=723 value=0.000000000 confirmed=0 events=1 accepted=1
+MQTT_SENT window=723
+MODEL window=724 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=2/1/1 inference_us_simulated=0
+EVIDENCE window=724 value=0.000000000 confirmed=0 events=1 accepted=1
+MQTT_SENT window=724
+MODEL window=725 pred=1 probability=0.911515 accepted=1 streak=1/1/1 confirmed=1/0/0 events=3/1/1 inference_us_simulated=142
+EVIDENCE window=725 value=0.411514720 confirmed=0 events=1 accepted=1
+MQTT_SENT window=725
+MODEL window=726 pred=1 probability=0.991835 accepted=1 streak=1/2/2 confirmed=1/1/0 events=3/2/1 inference_us_simulated=147
+EVIDENCE window=726 value=0.697592617 confirmed=0 events=1 accepted=1
+MQTT_SENT window=726
+MODEL window=727 pred=1 probability=0.982343 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/2 inference_us_simulated=147
+EVIDENCE window=727 value=0.750000000 confirmed=1 events=2 accepted=1
+MQTT_SENT window=727
+MODEL window=728 pred=1 probability=0.984306 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/2 inference_us_simulated=140
+EVIDENCE window=728 value=0.750000000 confirmed=1 events=2 accepted=1
+MQTT_SENT window=728
+MODEL window=729 pred=1 probability=0.991835 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/2 inference_us_simulated=147
+EVIDENCE window=729 value=0.750000000 confirmed=1 events=2 accepted=1
+MQTT_SENT window=729
+SCENARIO mode=ACTUAL_MODEL clip=GAP TRACE capture=3; original window IDs preserved
+MODEL window=716 pred=1 probability=0.983068 accepted=1 streak=1/1/1 confirmed=1/0/0 events=1/0/0 inference_us_simulated=140
+EVIDENCE window=716 value=0.483068474 confirmed=0 events=0 accepted=1
+MQTT_SENT window=716
+MODEL window=717 pred=1 probability=0.983068 accepted=1 streak=1/2/2 confirmed=1/1/0 events=1/1/0 inference_us_simulated=140
+EVIDENCE window=717 value=0.724602711 confirmed=0 events=0 accepted=1
+MQTT_SENT window=717
+MODEL window=718 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=1/1/0 inference_us_simulated=0
+EVIDENCE window=718 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=718
+MODEL window=719 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=1/1/0 inference_us_simulated=0
+EVIDENCE window=719 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=719
+MODEL window=720 pred=1 probability=0.704975 accepted=1 streak=1/1/1 confirmed=1/0/0 events=2/1/0 inference_us_simulated=123
+EVIDENCE window=720 value=0.204974651 confirmed=0 events=0 accepted=1
+MQTT_SENT window=720
+MODEL window=721 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=2/1/0 inference_us_simulated=0
+EVIDENCE window=721 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=721
+MODEL window=722 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=2/1/0 inference_us_simulated=0
+EVIDENCE window=722 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=722
+MODEL window=723 pred=0 probability=0.351129 accepted=1 streak=0/0/0 confirmed=0/0/0 events=2/1/0 inference_us_simulated=120
+EVIDENCE window=723 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=723
+MODEL window=724 pred=-1 probability=-1.000000 accepted=1 streak=0/0/0 confirmed=0/0/0 events=2/1/0 inference_us_simulated=0
+EVIDENCE window=724 value=0.000000000 confirmed=0 events=0 accepted=1
+MQTT_SENT window=724
+MODEL window=725 pred=1 probability=0.911515 accepted=1 streak=1/1/1 confirmed=1/0/0 events=3/1/0 inference_us_simulated=142
+EVIDENCE window=725 value=0.411514720 confirmed=0 events=0 accepted=1
+MQTT_SENT window=725
+MODEL window=726 pred=1 probability=0.991835 accepted=1 streak=1/2/2 confirmed=1/1/0 events=3/2/0 inference_us_simulated=147
+EVIDENCE window=726 value=0.697592617 confirmed=0 events=0 accepted=1
+MQTT_SENT window=726
+MODEL window=727 pred=1 probability=0.982343 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/1 inference_us_simulated=147
+EVIDENCE window=727 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=727
+MODEL window=728 pred=1 probability=0.984306 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/1 inference_us_simulated=140
+EVIDENCE window=728 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=728
+MODEL window=729 pred=1 probability=0.991835 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/1 inference_us_simulated=147
+EVIDENCE window=729 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=729
+MODEL window=730 pred=1 probability=0.991835 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/1 inference_us_simulated=147
+EVIDENCE window=730 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=730
+MODEL window=731 pred=1 probability=0.991835 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/1 inference_us_simulated=147
+EVIDENCE window=731 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=731
+MODEL window=732 pred=1 probability=0.991835 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/1 inference_us_simulated=147
+EVIDENCE window=732 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=732
+MODEL window=733 pred=1 probability=0.984306 accepted=1 streak=1/2/3 confirmed=1/1/1 events=3/2/1 inference_us_simulated=140
+EVIDENCE window=733 value=0.750000000 confirmed=1 events=1 accepted=1
+MQTT_SENT window=733
+END_OF_SCENARIO: Next or mode button restarts; start/pause replays.
+METRICS build=3f718dc4c8d9ea81 inferences=34 min_us=34 mean_us=124.853 max_us=147 heap_free=220704 heap_min=211168 image_bytes=928912 status_bytes=56 replay_bytes=1296 period_ms=200
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=30266
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=37013
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=43062
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=48661
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=54701
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=62682
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=67872
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=75349
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=80549
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=86104
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=94827
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=101701
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=107202
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=115300
+MQTT_CONNECTED topic=mqttguard/mqg-00c40a24-0d9245e7/status fault=0 simulated_ms=121739

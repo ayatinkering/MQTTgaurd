@@ -1,0 +1,55 @@
+{
+  "build_id": "3f718dc4c8d9ea81",
+  "observed_model_rows": 62,
+  "observed_scripted_rows": 0,
+  "complete_clip_passes": [
+    "BENIGN TRACE",
+    "SLOWITE TRACE",
+    "GAP TRACE"
+  ],
+  "model_rows_by_clip": {
+    "SLOWITE TRACE": 26,
+    "BENIGN TRACE": 18,
+    "GAP TRACE": 18
+  },
+  "prediction_or_state_disagreements": 0,
+  "simulated_inference_us": {
+    "count": 34,
+    "min": 34,
+    "median": 140.0,
+    "p95": 147.0,
+    "max": 147
+  },
+  "controlled_failure": {
+    "failed_connection_observed": false,
+    "model_rows_processed_while_fault_active": 0,
+    "reconnected_after_recovery": false
+  },
+  "resource_snapshots": [
+    {
+      "build": "3f718dc4c8d9ea81",
+      "inferences": "34",
+      "min_us": "34",
+      "mean_us": "124.853",
+      "max_us": "147",
+      "heap_free": "220704",
+      "heap_min": "211168",
+      "image_bytes": "928912",
+      "status_bytes": "56",
+      "replay_bytes": "1296",
+      "period_ms": "200"
+    }
+  ],
+  "source_sha256": "09731ddebae8f15d43d35b0b229fc4c1d1a999651e032b9485d80210eb71ce80",
+  "scope": "Actual extended Wokwi replay and independent MQTT reception; simulated timing, no physical measurements",
+  "evidence_policy": {
+    "family": "bounded_evidence",
+    "h": 0.75,
+    "decay": 0.5
+  },
+  "observed_evidence_rows": 62,
+  "evidence_state_disagreements": 0,
+  "independently_received_mqtt_model_rows": 53,
+  "mqtt_prediction_state_disagreements": 0,
+  "mqtt_sha256": "2e735d8c452656811e0a552afd95f113dbbb5e263e79a2d56cfe2359693754a4"
+}

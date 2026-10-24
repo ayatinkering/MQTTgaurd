@@ -1,5 +1,18 @@
 # Start here: MQTTGuard teammate handoff
 
+## Completed research extension — 24 October 2026
+
+The stronger-policy comparisons, audit version 2, continuous legitimate workload, independent MQTTset compatibility/direct-transfer/adaptation tests, and all 18 feature/window sensitivity configurations are complete. Read the [editable report content](../deliverables/report/REPORT_CONTENT.md) for the full paper narrative and [measured extended results](research/RESULTS.md) for tables. The original results below remain a historical baseline; legacy delays and clean false-event counts must not be mixed with audit-v2 endpoints.
+
+The new contribution is bounded gap-aware confidence accumulation with validation-only coverage-constrained calibration, implemented in C++. It is a modest application-specific extension to established sequential evidence methods. At matched 83/84 coverage in capture 1 it reduces benign occupancy 43.75% and mean delay 15.19% relative to k=2, while increasing benign starts from 3 to 5. It underperforms k=2 on the primary split; no universal advantage is claimed.
+
+The [research Wokwi demo](https://wokwi.com/projects/478737844363875329) uses `firmware/wokwi_research/`, build `3f718dc4c8d9ea81`, and adds a fourth evidence LED. Actual verification covers 62 paired model/evidence rows and 53 independently received MQTT records, with zero discrepancies. Original firmware and its demo remain available as the fixed baseline.
+
+MQTTset supplies substantial independent benign exposure and a supplementary DoS scenario. Its SlowITe file spans only 0.696832 seconds and cannot validate two-second temporal detection. Separate adaptation has perfect scenario-window test classification but false alarms under changed benign scope; it is not general 100% SlowITe detection. All these outcomes are retained.
+
+Only editable report content is requested now. Slides and synopsis production are stopped; the original course PDFs are unchanged.
+
+
 Updated 2026-10-24. This document carries the current project context so another teammate can continue without the chat.
 
 ## 1. What we are building now
@@ -99,15 +112,24 @@ These are dataset-specific findings from one testbed/day. Run labels are proxies
 
 ## 7. Known issues and prioritized next work
 
-For the research paper, follow [RESEARCH_FINDINGS](RESEARCH_FINDINGS.md): matched operating-point baselines, a full false-start/benign-occupancy metric audit, sustained benign traffic, and independent timestamped MQTT data are the highest-value pending experiments. Current numbers establish dataset-specific tradeoffs and a working embedded simulation; they do not establish general deployment-wide suppression or algorithmic novelty. Additional tuning on already inspected captures must be labelled exploratory.
+The requested research extensions and editable report are complete. Start from [report content](../deliverables/report/REPORT_CONTENT.md) and [all measured results](research/RESULTS.md), then adapt the prose to the course template. Slides are not requested. Original and research firmware have separate build fingerprints and evidence.
 
-1. **Course submission:** update the original report/slides/synopsis with the current architecture and measured tables. Preserve the original PDF; edit its LaTeX/source if available. The repository does not contain that source. A suggested replacement methodology paragraph appears below.
-2. **Broader target verification:** full observed serial logs and all demonstration clips are now verified. Extend to additional held-out inputs if necessary; preserve explicit build identity. Do not bypass declined PCAP permissions.
-3. **Additional network fault testing:** the controlled invalid-hostname failure/recovery test is complete. Optional next cases are prolonged disconnection, repeated recovery and WiFi loss; do not claim one test covers all failures.
-4. **Resource evidence:** simulator image size, heap and timing distribution are captured. A full linker/static-RAM breakdown or physical-chip measurements remain optional follow-ups. GPIO23 is an unwired timing marker for optional logic-analyzer work.
-5. **Schema refinement:** the clips are now distinct. TEST messages still retain capture=3, so mode must distinguish them; improve test-source identity if extending consumers.
-6. **Research extensions:** 1/5-second sensitivity is not executed. Since test results have been inspected, new variants are exploratory. Keep the original 2-second result and avoid retuning the final test.
-7. **Optional later:** raw-record window aggregation on ESP32, a ThingsBoard view, new capture/testbed data, or live collection. These are extensions, not missing prerequisites for the existing demo.
+To reproduce the extended study after the original training pipeline has produced `reports/experiment/model.joblib`:
+
+```bash
+.venv/bin/python scripts/mqttset_data.py
+.venv/bin/python scripts/run_extended_study.py
+.venv/bin/python scripts/verify_evidence_policy.py
+.venv/bin/python scripts/publish_extended_results.py
+.venv/bin/python scripts/build_research_report.py
+.venv/bin/python scripts/export_report_content.py
+.venv/bin/python -m pytest scripts -q
+.venv/bin/python scripts/verify_research_target.py docs/evidence/research_wokwi_serial.txt
+```
+
+Raw external captures are large and ignored by Git. The checked-in compressed local benign capture is replayed automatically when no local stress capture exists. Do not overwrite raw timing to make SlowITe compatible. The original pinned Colab notebook reproduces the original study; the extended commands above reproduce the new experiments. New capture collection is optional for exact replay and requires local packet capture tools.
+
+Future extensions are independent adequately timed SlowITe sessions with attack logs, multiple sites/days, physical power/timing, live target feature extraction and exhaustive network fault testing. They are outside the delivered simulation claims. All 18 sensitivity configurations are completed and exploratory; do not select a new official model by the best observed test score.
 
 The PCAP download was declined by the browser gate and was not retried. Browser access later recovered, allowing direct capture of observed serial text, full target verification and the controlled connection-recovery test without any browser file download. The saved Wokwi project matches the source fingerprint in firmware/wokwi/build.json.
 

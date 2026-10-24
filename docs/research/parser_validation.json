@@ -1,0 +1,10 @@
+{
+  "compared_records": 9202,
+  "parser_records": 9202,
+  "differences": {
+    "timestamp": 0,
+    "tcp_payload_length": 0,
+    "recorded_keepalive": 0
+  },
+  "comparison": "Author raw CSV versus independent PCAP parser, ordered records; CONNECT reassembly attributes metadata to completing segment"
+}

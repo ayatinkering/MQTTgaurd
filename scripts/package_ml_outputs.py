@@ -24,6 +24,8 @@ def package(output):
     for folder, suffixes in [
         ('firmware', {'.h', '.ino', '.json', '.txt'}),
         ('docs/results', {'.json', '.csv', '.md', '.png'}),
+        ('docs/research', {'.json', '.csv', '.md', '.png'}),
+        ('deliverables/report', {'.md', '.tex', '.png'}),
         ('scripts', {'.py'}),
         ('notebooks', {'.ipynb'}),
         ('reports/experiment', {'.joblib', '.npz', '.csv', '.json'}),
@@ -34,7 +36,10 @@ def package(output):
     for name in ['requirements.lock', 'README.md', 'docs/COLAB.md',
                  'docs/METHODOLOGY.md', 'docs/IMPLEMENTATION.md',
                  'docs/DATASET_REVIEW.md', 'docs/REPORT_REFERENCES.md',
-                 'docs/RESEARCH_FINDINGS.md']:
+                 'docs/RESEARCH_FINDINGS.md', 'docs/EXTENDED_PROTOCOL.md',
+                 'docs/EXTERNAL_PROTOCOL_AMENDMENT.md',
+                 'docs/evidence/benign_workloads.pcap.gz',
+                 'docs/evidence/benign_workload_sessions.json']:
         selected.add(ROOT / name)
     selected = sorted(selected)
     # Snapshot bytes once: archive and hashes describe exactly the same content.

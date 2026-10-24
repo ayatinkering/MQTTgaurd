@@ -1,0 +1,28 @@
+{
+  "dataset": "MQTTset",
+  "version": 5,
+  "source": "https://www.kaggle.com/datasets/cnrieiit/mqttset",
+  "paper": "https://doi.org/10.3390/s20226578",
+  "license": "CC BY-NC-SA 4.0 per Kaggle metadata; publisher README contains a conflicting Apache software license statement",
+  "files": [
+    {
+      "name": "capture_1w.pcap",
+      "bytes": 1093676216,
+      "sha256": "618713a94e557798ce860d33b963476b3aacde3b8c2ccba66f50286d694b2802",
+      "url": "https://www.kaggle.com/api/v1/datasets/download/cnrieiit/mqttset/Data%2FPCAP%2Fcapture_1w.pcap?datasetVersionNumber=5"
+    },
+    {
+      "name": "slowite.pcap",
+      "bytes": 807678,
+      "sha256": "5bc2e3fe74a52567ad1a01aae69aa166a33b98fe1a3c485501d48083904d22b5",
+      "url": "https://www.kaggle.com/api/v1/datasets/download/cnrieiit/mqttset/Data%2FPCAP%2Fslowite.pcap?datasetVersionNumber=5"
+    },
+    {
+      "name": "capture_malariaDoS.pcap",
+      "bytes": 49875539,
+      "sha256": "ce84b58a2695fd3aba08f8b19a09265b74b223a5e3bf8a51030c84977a947e34",
+      "url": "https://www.kaggle.com/api/v1/datasets/download/cnrieiit/mqttset/Data%2FPCAP%2Fcapture_malariaDoS.pcap?datasetVersionNumber=5"
+    }
+  ],
+  "label_scope": "Known benign file and SlowITe scenario file; no invented packet-level attack labels"
+}

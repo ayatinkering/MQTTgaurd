@@ -1,0 +1,6 @@
+{
+  "original_comparisons": true,
+  "sensitivity": true,
+  "external_validation": true,
+  "real_time_benign_stress": true
+}

@@ -1,0 +1,9 @@
+{
+  "build_id": "3f718dc4c8d9ea81",
+  "sketch_sha256": "78294bb8064b52f902c837da509c4c41a4c11c3b14de7406fff638e9c43c7106",
+  "policy": {
+    "family": "bounded_evidence",
+    "h": 0.75,
+    "decay": 0.5
+  }
+}

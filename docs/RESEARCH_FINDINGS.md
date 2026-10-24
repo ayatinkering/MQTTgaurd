@@ -1,4 +1,17 @@
-# Research findings and remaining evidence
+# Research findings and completed evidence
+
+## Completed research extension — 24 October 2026
+
+The stronger-policy comparisons, audit version 2, continuous legitimate workload, independent MQTTset compatibility/direct-transfer/adaptation tests, and all 18 feature/window sensitivity configurations are complete. Read the [editable report content](../deliverables/report/REPORT_CONTENT.md) for the full paper narrative and [measured extended results](research/RESULTS.md) for tables. The original results below remain a historical baseline; legacy delays and clean false-event counts must not be mixed with audit-v2 endpoints.
+
+The new contribution is bounded gap-aware confidence accumulation with validation-only coverage-constrained calibration, implemented in C++. It is a modest application-specific extension to established sequential evidence methods. At matched 83/84 coverage in capture 1 it reduces benign occupancy 43.75% and mean delay 15.19% relative to k=2, while increasing benign starts from 3 to 5. It underperforms k=2 on the primary split; no universal advantage is claimed.
+
+The [research Wokwi demo](https://wokwi.com/projects/478737844363875329) uses `firmware/wokwi_research/`, build `3f718dc4c8d9ea81`, and adds a fourth evidence LED. Actual verification covers 62 paired model/evidence rows and 53 independently received MQTT records, with zero discrepancies. Original firmware and its demo remain available as the fixed baseline.
+
+MQTTset supplies substantial independent benign exposure and a supplementary DoS scenario. Its SlowITe file spans only 0.696832 seconds and cannot validate two-second temporal detection. Separate adaptation has perfect scenario-window test classification but false alarms under changed benign scope; it is not general 100% SlowITe detection. All these outcomes are retained.
+
+Only editable report content is requested now. Slides and synopsis production are stopped; the original course PDFs are unchanged.
+
 
 Updated 24 October 2026. This document distinguishes measured findings, their interpretation, and experiments still needed. Numerical sources are [primary results](results/primary.json), [capture-held-out results](results/robustness.json), [dataset audit](DATASET_REVIEW.md), and [embedded evidence](evidence/EMBEDDED_VERIFICATION.md).
 
@@ -94,23 +107,10 @@ The supplied Colab outputs match the existing model, predictions and numerical s
 
 The adopted Colab notebook is under `notebooks/`. It uses a fixed source commit, runs the repository scripts, regenerates all report exports, bundles the current firmware, and records input/output hashes. It does not itself supply an independent evaluation dataset. See [Colab instructions](COLAB.md).
 
-## 8. What remains to establish for a stronger research paper
+## 8. Completed stronger study and report content
 
-| Priority | Unanswered question | Required experiment/evidence | Status |
-| --- | --- | --- | --- |
-| 1 | Does persistence improve the tradeoff beyond simply raising the score threshold? | Compare immediate alerts, k=2/3, raised probability thresholds, and a causal small majority/average filter using the same frozen score streams; choose operating points on validation data and report test recall, delay, false starts and occupancy together | Not run |
-| 1 | Are false-alarm improvements robust to sparse-bin artifacts? | Audit metric definitions and compare against always-positive and ideal-label controls; report eligible consecutive-benign opportunities, excluded event categories and benign-state occupancy | Initial ideal-label diagnostic and sparsity audit done; full comparator/metric audit pending |
-| 1 | Does it work on sustained benign traffic with realistic changes? | Continuous legitimate sessions with bursts, reconnects, changing publish intervals and idle periods; record capture/label provenance and evaluate all benign alarm time | Not run; simulated stress cases must remain separate from recorded evidence |
-| 2 | Does it generalize beyond this testbed/day? | Independent timestamped MQTT traces with compatible measurable features and labels; freeze preprocessing/thresholds before testing; separate direct transfer from retraining | Not run; second dataset compatibility must first be audited |
-| 2 | How reliable are estimates across independent sessions? | Repeated independently captured sessions/days and session-level uncertainty estimates | Not available from the four current captures alone |
-| 2 | Are four features or two-second windows essential? | Training/validation-only feature ablation and prespecified 1/2/5-second sensitivity, with complete gaps preserved | Not run; further work on already seen captures is exploratory |
-| 3 | Are run delays valid against real attack execution times? | Independent start/stop logs, or explicitly retain the label-run-proxy limitation | Logs not provided |
-| 3 | Do physical resource and live-network claims hold? | Physical-chip timing/power and/or live capture/feature extraction | Outside current simulation scope; do not claim these |
+All five requested numerical extensions are complete: stronger simple comparators, full alarm audit, real-time legitimate workload, independent timestamped MQTT compatibility and evaluation, and 18 feature/window sensitivity configurations. See [extended results](research/RESULTS.md), [audit CSV](research/alarm_audit.csv), [protocol](EXTENDED_PROTOCOL.md) and [external amendment](EXTERNAL_PROTOCOL_AMENDMENT.md).
 
-Before collecting or examining new test outcomes, save the comparison protocol: exact features, split unit, thresholds/search grid, filter/reset rules, primary endpoints and exclusion rules. All existing captures have been inspected, so additional tuning on them is exploratory. Keep original primary results unchanged and label extensions separately. No experiment should be designed to manufacture a high false-alarm baseline.
+The editable report contains the full introduction, critical literature comparison, proposed bounded evidence method, reproducible evaluation, measured results and threats to validity. See [report content](../deliverables/report/REPORT_CONTENT.md) or [LaTeX source](../deliverables/report/main.tex). User requested report content only; slides and synopsis production stopped.
 
-## 9. Report preparation remaining
-
-Update the course report, synopsis and slides to describe host feature extraction plus ESP32 inference, rather than the original host-only plan. Include a dataset/coverage table, confusion matrix, primary tradeoff table, robustness table, embedded evidence table and explicit threats-to-validity section. Cite source research and distinguish a course implementation contribution from a newly invented detection algorithm.
-
-A report can already describe the completed system and measured tradeoffs. A broad claim of reliable false-alarm reduction across real MQTT deployments needs the pending comparison and external-validation evidence above. Existing PDFs have not been rewritten.
+Remaining scientific limits are independent adequately timed SlowITe execution logs, repeated sites/days, physical measurements and live packet extraction on target. These are limits of claims, not unfinished steps hidden behind the completed study. The independent SlowITe download is temporally incompatible; the external DoS and benign experiments are explicitly labelled substitutes for their respective questions, not fabricated SlowITe validation.

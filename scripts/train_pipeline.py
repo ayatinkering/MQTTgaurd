@@ -22,7 +22,9 @@ def number(s):
         return v if np.isfinite(v) else np.nan
     except (ValueError, TypeError): return np.nan
 
-def make_capture(path, capture):
+def make_capture(path, capture, window_s=2):
+    window_us=int(window_s*1000000)
+    if window_us<=0: raise ValueError('Window duration must be positive')
     bins={}; runs=[]; previous=None; current=None; origin=None; last=None
     with path.open() as f:
         for row in csv.DictReader(f):
@@ -37,21 +39,21 @@ def make_capture(path, capture):
                     current=len(runs); runs.append({'id':current,'start':ts,'end':ts})
             if current is not None: runs[current]['end']=ts
             previous=label
-            j=(ts-origin)//2000000
+            j=(ts-origin)//window_us
             b=bins.setdefault(j, {'times':[], 'lengths':[], 'keepalive':[], 'labels':Counter(), 'runs':set()})
             b['times'].append(ts); b['lengths'].append(number(row['tcp_len'])); b['keepalive'].append(number(row['mqtt_kalive'])); b['labels'][label]+=1
             if current is not None: b['runs'].add(current)
-    complete=(last-origin)//2000000
+    complete=(last-origin)//window_us
     windows=[]
     def mean(a):
         a=np.asarray(a); return float(np.nanmean(a)) if np.isfinite(a).any() else np.nan
     for j in range(complete):
         b=bins.get(j)
         if not b:
-            windows.append({'id':j,'end':origin+(j+1)*2000000,'valid':False,'x':[np.nan]*4,'y':-1,'labels':{},'runs':set()}); continue
+            windows.append({'id':j,'end':origin+(j+1)*window_us,'valid':False,'x':[np.nan]*4,'y':-1,'labels':{},'runs':set()}); continue
         n=len(b['times']); labels=set(b['labels'])
         x=[n,mean(b['lengths']), (b['times'][-1]-b['times'][0])/1e6/(n-1) if n>1 else np.nan,mean(b['keepalive'])]
-        windows.append({'id':j,'end':origin+(j+1)*2000000,'valid':True,'x':x,'y':0 if labels=={'legitimate'} else 1 if labels=={'slowite'} else -1,'labels':dict(b['labels']),'runs':b['runs']})
+        windows.append({'id':j,'end':origin+(j+1)*window_us,'valid':True,'x':x,'y':0 if labels=={'legitimate'} else 1 if labels=={'slowite'} else -1,'labels':dict(b['labels']),'runs':b['runs']})
     return {'id':capture,'origin':origin,'windows':windows,'runs':runs,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
 
 def cohort(captures, ids):

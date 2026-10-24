@@ -1,45 +1,32 @@
 # MQTTGuard implementation status
 
-Updated: 2026-10-24. Core implementation, complete-clip target verification, controlled connection recovery and current-version handoff documentation complete. The friend's ML reproduction is reviewed; current Colab workflow and report metric exports are added. Follow-up research experiments are listed separately.
+Updated 24 October 2026. The implemented embedded simulation and extended numerical study are complete; editable report content is ready for the team to adapt.
 
-**Live demo:** https://wokwi.com/projects/478675756306751489
+## Completed research extension — 24 October 2026
 
-- [x] Dataset downloaded, checksummed and audited.
-- [x] Installed reviewed scikit-learn and scientific-critical-thinking skills.
-- [x] Trained compact RF and rate baseline; primary and four held-out-capture evaluations.
-- [x] Exported soft-voting C++ model; zero Python/C++ label disagreements on all valid replay inputs plus boundary checks (see results manifest for count).
-- [x] Built, saved and ran ESP32 firmware/circuit in Wokwi.
-- [x] Verified actual inference and k=1/2/3 confirmation in simulation.
-- [x] Verified button controls, scripted isolated/sustained positives, gaps and duplicate rejection.
-- [x] Received actual Wokwi MQTT status messages in Python; evidence saved.
-- [x] Twelve Python/host-C++ tests passed, including the final checkpoint rerun.
-- [x] Saved research summaries, diagnostic results, plot, serial evidence and screenshot.
-- [x] Rewritten README/PRD/methodology for the current embedded version; added implementation, demo and teammate handoff guides.
-- [x] Final reproduction/test/link checks; all six initial and 11 recovery-test MQTT model records match host predictions/counters.
-- [x] Complete Wokwi passes of all three distinct validation clips; 90 observed MODEL rows agree with the host reference.
-- [x] Controlled target-resolution failure/recovery; inference continues during failed connections and MQTT reception resumes.
-- [x] Recorded simulator image size, heap and inference-time distribution, with measurement limits.
+The stronger-policy comparisons, audit version 2, continuous legitimate workload, independent MQTTset compatibility/direct-transfer/adaptation tests, and all 18 feature/window sensitivity configurations are complete. Read the [editable report content](../deliverables/report/REPORT_CONTENT.md) for the full paper narrative and [measured extended results](research/RESULTS.md) for tables. The original results below remain a historical baseline; legacy delays and clean false-event counts must not be mixed with audit-v2 endpoints.
 
-## Measured primary result
+The new contribution is bounded gap-aware confidence accumulation with validation-only coverage-constrained calibration, implemented in C++. It is a modest application-specific extension to established sequential evidence methods. At matched 83/84 coverage in capture 1 it reduces benign occupancy 43.75% and mean delay 15.19% relative to k=2, while increasing benign starts from 3 to 5. It underperforms k=2 on the primary split; no universal advantage is claimed.
 
-Classifier accuracy is 90.35%, precision 100%, recall 72.22%, F1 83.87% on 570 pure-class windows. The friend's Colab outputs reproduce this same model, rather than a different improved classifier. See [research findings](RESEARCH_FINDINGS.md) for complete measured results and prioritized pending research, and [Colab](COLAB.md) for the adopted workflow. Original course PDFs remain unchanged; the added notebook has local syntax/pipeline checks, not a newly observed hosted Colab run.
+The [research Wokwi demo](https://wokwi.com/projects/478737844363875329) uses `firmware/wokwi_research/`, build `3f718dc4c8d9ea81`, and adds a fourth evidence LED. Actual verification covers 62 paired model/evidence rows and 53 independently received MQTT records, with zero discrepancies. Original firmware and its demo remain available as the fixed baseline.
 
-Train loops 1+2, validate loop 3, test loop 4. Selected RF: 16 trees, depth 3. Window F1: 0.8387; SlowITe-window recall: 0.7222.
+MQTTset supplies substantial independent benign exposure and a supplementary DoS scenario. Its SlowITe file spans only 0.696832 seconds and cannot validate two-second temporal detection. Separate adaptation has perfect scenario-window test classification but false alarms under changed benign scope; it is not general 100% SlowITe detection. All these outcomes are retained.
 
-| k | Clean false events | Observed runs detected | Mean detection delay |
-| --- | ---: | ---: | ---: |
-| 1 | 0 | 12/12 | 0.888 s |
-| 2 | 0 | 12/12 | 3.555 s |
-| 3 | 0 | 10/12 | 4.900 s |
+Only editable report content is requested now. Slides and synopsis production are stopped; the original course PDFs are unchanged.
 
-No false-alarm reduction is demonstrated on this primary capture: k=1 already has zero, and adjacent pure-benign windows are absent. Separate robustness results expose the trade-off, e.g. capture 1 changes 66 to 3 false events at k=2 while detections change 84/84 to 83/84. These are observed label runs from one testbed/day, not independently validated attack executions.
+## Completed deliverables
 
-## Handoff and current verification
+- Original four-feature RF, exact C++ export and original ESP32 inference/confirmation demo.
+- Seven causal policy families and fixed k=1/2/3 references, with validation-only parameter selection.
+- Audit-v2 onset, occupancy, exclusion, coverage, miss and conditional-delay accounting.
+- 120 seconds of actual local benign traffic: 24 clients, six profiles, 2,335 publishes; replay fixture retained.
+- MQTTset raw timestamp compatibility, 11,915,716 benign TCP records, direct transfer and separate chronological adaptation; incompatible SlowITe file explicitly excluded from temporal scoring.
+- All 18 prespecified window/feature sensitivity configurations, labelled exploratory.
+- 2,721,252 host C++ evidence-policy transitions checked with zero state/event discrepancies.
+- New Wokwi implementation and independent MQTT verification; original controlled network-recovery evidence retained separately.
+- 20 automated tests pass. Original RF export parity remains 11,210 inputs with zero label disagreement.
+- Editable report Markdown and LaTeX; original course files unchanged. No slides requested.
 
-Start with [HANDOFF](HANDOFF.md), then [IMPLEMENTATION](IMPLEMENTATION.md), [METHODOLOGY](METHODOLOGY.md), and [DEMO](DEMO.md). Generated model export parity covers 11,210 inputs with zero label disagreements; twelve automated tests pass. The initial six-message and later 11-message integration samples are separately verified. See [embedded verification](evidence/EMBEDDED_VERIFICATION.md) for the complete target and connection-recovery evidence.
+## Reproduction and scope
 
-## Boundaries and remaining limitations
-
-Feature extraction and training run on the host. ESP32 executes the actual trained model on replayed features; it does not sniff live traffic. MQTT reporting works through a public test broker and is best-effort. Inference remains independent of network-task retries. Physical hardware timing/power, live attacks, ThingsBoard, and raw-packet feature extraction are not implemented.
-
-The optional Wokwi PCAP download was declined by the browser permission gate; no workaround was attempted. Serial, screenshot and externally received MQTT evidence are retained instead. A controlled client target-resolution failure/recovery test is now verified; exhaustive network fault testing and 1/5-second sensitivity experiments remain future work. Simulator measurements include firmware image/heap, not a full physical or linker-section resource report.
+Start with [HANDOFF](HANDOFF.md). Original classifier accuracy 90.35%, recall 72.22%, F1 83.87% describe the same model. The proposed policy has a useful capture-1 tradeoff but does not dominate the primary k=2 rule. The model is run on prerecorded feature windows on a simulated ESP32; host extraction/training, best-effort status, no physical power measurements and no live attack/sniffer claim.

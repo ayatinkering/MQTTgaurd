@@ -1,0 +1,549 @@
+{
+  "score_policy_transitions": 2721252,
+  "label_or_event_disagreements": 0,
+  "host_state_bytes": 40,
+  "checks": [
+    {
+      "stream": "external_adapted_capture_1w.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.75,
+        "decay": 0.5
+      },
+      "transitions": 121017,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_1w.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 121017,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_1w.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 1.0,
+        "decay": 0.8
+      },
+      "transitions": 121017,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_1w.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 121017,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_1w.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 121017,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_1w.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 121017,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_malariaDoS.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.75,
+        "decay": 0.5
+      },
+      "transitions": 22,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_malariaDoS.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 22,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_malariaDoS.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 1.0,
+        "decay": 0.8
+      },
+      "transitions": 22,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_malariaDoS.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 22,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_malariaDoS.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 22,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_adapted_capture_malariaDoS.pcap_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 22,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_1w.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.75,
+        "decay": 0.5
+      },
+      "transitions": 302551,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_1w.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 302551,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_1w.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 1.0,
+        "decay": 0.8
+      },
+      "transitions": 302551,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_1w.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 302551,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_1w.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 302551,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_1w.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 302551,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_malariaDoS.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.75,
+        "decay": 0.5
+      },
+      "transitions": 63,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_malariaDoS.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 63,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_malariaDoS.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 1.0,
+        "decay": 0.8
+      },
+      "transitions": 63,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_malariaDoS.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 63,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_malariaDoS.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 63,
+      "disagreements": 0
+    },
+    {
+      "stream": "external_direct_capture_malariaDoS.pcap.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 63,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_1_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.75,
+        "decay": 0.5
+      },
+      "transitions": 15173,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_1_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 15173,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_1_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 1.0,
+        "decay": 0.8
+      },
+      "transitions": 15173,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_1_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 15173,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_1_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 15173,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_1_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 15173,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_2_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.75,
+        "decay": 0.5
+      },
+      "transitions": 4681,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_2_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 4681,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_2_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 1.0,
+        "decay": 0.8
+      },
+      "transitions": 4681,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_2_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 4681,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_2_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 4681,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_2_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 4681,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_3_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.75,
+        "decay": 0.5
+      },
+      "transitions": 2581,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_3_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 2581,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_3_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 1.0,
+        "decay": 0.8
+      },
+      "transitions": 2581,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_3_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 2581,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_3_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 2581,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_3_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 2581,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_4_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.75,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_4_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_4_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 1.0,
+        "decay": 0.8
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_4_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_4_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "fold_4_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "primary_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.75,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "primary_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "primary_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 1.0,
+        "decay": 0.8
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "primary_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "primary_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.5,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    },
+    {
+      "stream": "primary_test.npz",
+      "policy": {
+        "family": "bounded_evidence",
+        "h": 0.1,
+        "decay": 0.5
+      },
+      "transitions": 3727,
+      "disagreements": 0
+    }
+  ],
+  "edge_cases_passed": true,
+  "scope": "Host-compiled actual evidence module; not an ESP32 timing or full target execution claim"
+}

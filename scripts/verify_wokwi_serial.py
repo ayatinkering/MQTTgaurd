@@ -7,12 +7,12 @@ from train_pipeline import ROOT,make_capture,predict_capture,confirm
 ROW=re.compile(r'(MODEL|TEST) window=(\d+) pred=(-?\d+) probability=(-?[\d.]+) accepted=(\d+) streak=(\d+)/(\d+)/(\d+) confirmed=(\d+)/(\d+)/(\d+) events=(\d+)/(\d+)/(\d+) inference_us_simulated=(\d+)')
 SCENARIO=re.compile(r'SCENARIO mode=(ACTUAL_MODEL|SCRIPTED_TEST).*?clip=([^\n]+?) capture=3;')
 
-def verify(text):
+def verify(text, build_path=None):
     saved=joblib.load(ROOT/'reports/experiment/model.joblib')
     cap=make_capture(ROOT/'data/raw/MQTTEEB-D_dataset_loop_3.csv',3)
     preds,_=predict_capture(cap,saved['imputer'],saved['model'])
     manifest=json.loads((ROOT/'docs/results/manifest.json').read_text());clips={c['name']:c for c in manifest['clips']}
-    build=json.loads((ROOT/'firmware/wokwi/build.json').read_text())['build_id']
+    build=json.loads((build_path or ROOT/'firmware/wokwi/build.json').read_text())['build_id']
     assert 'BUILD='+build in text,'Observed firmware build does not match local bundle'
     current=None;counter=[0,0,0];active=[False]*3;events=[0]*3;last=None;counts={};timings=[];models=0;tests=0
     scenarios=[]; fault=False;during_fault=0;failed=False;recovered=False;fault_start_index=None

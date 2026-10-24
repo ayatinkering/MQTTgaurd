@@ -1,0 +1,11 @@
+{
+  "protocol_sha256": "123eef68ab10dbfd9e1386789fe9bbc014dc8e0fa6a6b03a1bc83d00134460f4",
+  "protocol_commit": "5f0c1e6",
+  "metric_version": 2,
+  "original_data_status": "exploratory extension; original outcomes previously inspected",
+  "source_files": {
+    "scripts/run_extended_study.py": "b48ad7fdba7a38c320cd89be2299149f15b047499f0e13a164df599555678a35",
+    "scripts/research_core.py": "ee647053c246ddd7298bdf0851668747a36e5597f7a18cc7af144d2a2dcbe022",
+    "scripts/mqttset_data.py": "ae1995dc47ade5d4bb69f0a0f3b5f7e6cca1ff88476717cfbc770353c8392b8e"
+  }
+}
