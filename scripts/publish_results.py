@@ -33,7 +33,7 @@ for r in rf:
         if abs(r['classification'][key]-metrics[column])>1e-12:
             raise ValueError('Stored classification scores disagree with confusion counts')
 with (d/'classification_metrics.csv').open('w',newline='') as f:
-    writer=csv.DictWriter(f,fieldnames=list(metrics));writer.writeheader();writer.writerow(metrics)
+    writer=csv.DictWriter(f,fieldnames=list(metrics),lineterminator='\n');writer.writeheader();writer.writerow(metrics)
 persist=[]
 for r in rf:
     persist.append({
@@ -50,7 +50,7 @@ for r in rf:
         'ambiguous_or_out_of_scope_event_starts':r['ambiguous_or_out_of_scope_events'],
     })
 with (d/'persistence_metrics.csv').open('w',newline='') as f:
-    writer=csv.DictWriter(f,fieldnames=list(persist[0]));writer.writeheader();writer.writerows(persist)
+    writer=csv.DictWriter(f,fieldnames=list(persist[0]),lineterminator='\n');writer.writeheader();writer.writerows(persist)
 lines=['# Measured MQTTGuard results','', 'Generated from the checked-in JSON summaries. Dataset: original MQTTEEB-D v2 captures. Labels define observed run proxies, not independently timed physical attack executions.','', '## Primary test: train 1+2, validate 3, test 4','', '| Model | k | Window F1 | False clean events | Detected runs | Mean delay (s) |','| --- | ---: | ---: | ---: | ---: | ---: |']
 lines[4:4]=[
     'Primary RF accuracy is **'+f"{metrics['Accuracy']:.4%}"+'**, SlowITe precision **'+f"{metrics['Precision (SlowITe)']:.2%}"+'**, recall **'+f"{metrics['Recall (SlowITe)']:.2%}"+'**, and F1 **'+f"{metrics['F1-score (SlowITe)']:.2%}"+'**. These are different metrics of the same model.',
