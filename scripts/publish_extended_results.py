@@ -44,7 +44,6 @@ def main():
         'benign_occupancy_reduction_fraction':1-b['benign_alarm_fraction']/a['benign_alarm_fraction'],
         'mean_delay_reduction_fraction':1-b['coverage_delay_mean_s']/a['coverage_delay_mean_s']},
         'external':external,'stress':stress,'sensitivity':sensitivity,'cpp_parity':parity}
-    (D/'report_data.json').write_text(json.dumps(summary,indent=2)+'\n')
     columns=['study','capture','model_tag','policy','base_f1','benign_alarm_onsets','legacy_clean_false_onsets',
              'benign_alarm_seconds','benign_exposure_seconds','benign_alarm_fraction','excluded_alarm_onsets',
              'covered_runs','run_count','runs_with_new_onset','coverage_delay_mean_s','coverage_delay_median_s',
@@ -95,9 +94,9 @@ def main():
     for r in sensitivity:lines.append(f"| {r['seconds']} | {r['feature_set']} | {r['base_classifier']['f1']:.4f} | {r['k2']['covered_runs']}/{r['k2']['run_count']} | {r['proposed']['covered_runs']}/{r['proposed']['run_count']} |")
     lines += ['', 'All 18 prespecified sensitivity configurations are retained. Results do not justify choosing a new official model from the best inspected test score. Different durations change the evaluated window cohort, so F1 changes are not paired predictions on identical rows.','',
               '## Embedded evidence','',
-              f"The actual C++ bounded-evidence module matches Python on {parity['score_policy_transitions']:,} saved score/policy transitions with zero state/event disagreements. Host sizeof is {parity['host_state_bytes']} bytes, including configuration and counters; ESP32 size and timings are separate target observations. New firmware is under firmware/wokwi_research and preserves the original verified firmware under firmware/wokwi. Target verification is documented separately after the new build runs.",
+              f"The actual C++ bounded-evidence module matches Python on {parity['score_policy_transitions']:,} saved score/policy transitions with zero state/event disagreements. Host sizeof is {parity['host_state_bytes']} bytes, including configuration and counters; ESP32 size and timings are separate target observations. Current firmware is under firmware/wokwi_research; the original baseline bundle is regenerated under ignored firmware/wokwi. Actual target verification is recorded in docs/evidence/research_target_verification.json.",
               '', '## Files and reproduction','',
-              'Numerical sources: comparisons.json, validation_frontiers.json, test_frontiers.json, external_results.json, sensitivity.json, benign_stress_results.json, external_manifest.json, parser_validation.json, evidence_cpp_parity.json and report_data.json. Raw captures and per-window scores remain under ignored data/ and reports/ paths.','',
+              'Numerical sources: comparisons.json, validation_frontiers.json, test_frontiers.json, external_results.json, sensitivity.json, benign_stress_results.json, external_manifest.json, parser_validation.json and evidence_cpp_parity.json. Raw captures and per-window scores remain under ignored data/ and reports/ paths.','',
               '```bash','.venv/bin/python scripts/mqttset_data.py','.venv/bin/python scripts/benign_stress.py','.venv/bin/python scripts/run_extended_study.py','.venv/bin/python scripts/bundle_research_firmware.py','.venv/bin/python scripts/verify_evidence_policy.py','.venv/bin/python scripts/publish_extended_results.py','```','']
     text='\n'.join(lines)
     (D/'RESULTS.md').write_text(text)
@@ -118,7 +117,7 @@ def main():
         for j in range(len(names)):ax.text(j,i,f'{values[i,j]:.3f}',ha='center',va='center',color='white' if values[i,j]>.6 else 'black')
     ax.set_title('Exploratory primary-test F1 across all 18 configurations')
     fig.colorbar(im,ax=ax,label='SlowITe F1');fig.tight_layout();fig.savefig(D/'sensitivity.png',dpi=180);plt.close(fig)
-    print('Published extended tables, audit CSV, report data and figures.')
+    print('Published extended tables, audit CSV and figures.')
 
 
 if __name__=='__main__':main()

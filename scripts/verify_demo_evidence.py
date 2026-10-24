@@ -15,7 +15,7 @@ def main():
     cap=make_capture(ROOT/'data/raw/MQTTEEB-D_dataset_loop_3.csv',3)
     prediction,_=predict_capture(cap,saved['imputer'],saved['model'])
     manifest=json.loads((ROOT/'docs/results/manifest.json').read_text()); clips=manifest['clips']
-    parser=argparse.ArgumentParser();parser.add_argument('--file',type=Path,default=ROOT/'docs/evidence/mqtt_received.jsonl');parser.add_argument('--output',type=Path,default=ROOT/'docs/evidence/verification.json');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--file',type=Path,default=ROOT/'docs/evidence/mqtt_recovery.jsonl');parser.add_argument('--output',type=Path,default=ROOT/'docs/evidence/mqtt_recovery_verification.json');args=parser.parse_args()
     evidence=args.file; checked=0
     for line in evidence.read_text().splitlines():
         p=json.loads(line)['payload']

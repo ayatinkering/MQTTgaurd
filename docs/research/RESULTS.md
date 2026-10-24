@@ -106,11 +106,11 @@ All 18 prespecified sensitivity configurations are retained. Results do not just
 
 ## Embedded evidence
 
-The actual C++ bounded-evidence module matches Python on 2,721,252 saved score/policy transitions with zero state/event disagreements. Host sizeof is 40 bytes, including configuration and counters; ESP32 size and timings are separate target observations. New firmware is under firmware/wokwi_research and preserves the original verified firmware under firmware/wokwi. Target verification is documented separately after the new build runs.
+The actual C++ bounded-evidence module matches Python on 2,721,252 saved score/policy transitions with zero state/event disagreements. Host sizeof is 40 bytes, including configuration and counters; ESP32 size and timings are separate target observations. Current firmware is under firmware/wokwi_research; the original baseline bundle is regenerated under ignored firmware/wokwi. Actual target verification is recorded in docs/evidence/research_target_verification.json.
 
 ## Files and reproduction
 
-Numerical sources: comparisons.json, validation_frontiers.json, test_frontiers.json, external_results.json, sensitivity.json, benign_stress_results.json, external_manifest.json, parser_validation.json, evidence_cpp_parity.json and report_data.json. Raw captures and per-window scores remain under ignored data/ and reports/ paths.
+Numerical sources: comparisons.json, validation_frontiers.json, test_frontiers.json, external_results.json, sensitivity.json, benign_stress_results.json, external_manifest.json, parser_validation.json and evidence_cpp_parity.json. Raw captures and per-window scores remain under ignored data/ and reports/ paths.
 
 ```bash
 .venv/bin/python scripts/mqttset_data.py

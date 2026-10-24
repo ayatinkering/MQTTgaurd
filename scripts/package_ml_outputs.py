@@ -25,6 +25,7 @@ def package(output):
         ('firmware', {'.h', '.ino', '.json', '.txt'}),
         ('docs/results', {'.json', '.csv', '.md', '.png'}),
         ('docs/research', {'.json', '.csv', '.md', '.png'}),
+        ('docs/evidence', {'.json', '.jsonl', '.txt', '.gz', '.png', '.md'}),
         ('deliverables/report', {'.md', '.tex', '.png'}),
         ('scripts', {'.py'}),
         ('notebooks', {'.ipynb'}),
@@ -34,12 +35,9 @@ def package(output):
                         if p.is_file() and p.suffix in suffixes
                         and '__pycache__' not in p.parts)
     for name in ['requirements.lock', 'README.md', 'docs/COLAB.md',
-                 'docs/METHODOLOGY.md', 'docs/IMPLEMENTATION.md',
-                 'docs/DATASET_REVIEW.md', 'docs/REPORT_REFERENCES.md',
-                 'docs/RESEARCH_FINDINGS.md', 'docs/EXTENDED_PROTOCOL.md',
-                 'docs/EXTERNAL_PROTOCOL_AMENDMENT.md',
-                 'docs/evidence/benign_workloads.pcap.gz',
-                 'docs/evidence/benign_workload_sessions.json']:
+                 'docs/METHODOLOGY.md', 'docs/DEMO.md',
+                 'docs/DATASET_REVIEW.md', 'docs/DATASET_MANIFEST.json',
+                 'docs/EXTENDED_PROTOCOL.md', 'docs/EXTERNAL_PROTOCOL_AMENDMENT.md']:
         selected.add(ROOT / name)
     selected = sorted(selected)
     # Snapshot bytes once: archive and hashes describe exactly the same content.

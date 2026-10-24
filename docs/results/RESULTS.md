@@ -8,7 +8,7 @@ Confusion matrix (true rows / predicted columns; legitimate, SlowITe): `[[372, 0
 
 Exports: [classification CSV](classification_metrics.csv), [persistence CSV](persistence_metrics.csv), and [classification figure](classification_metrics.png). `base_classifier_window_FPR` repeats the pre-confirmation classifier FPR; it is not post-confirmation FPR. Benign-window exposure sums eligible two-second windows, not independently observed continuous benign sessions. Clean false-event starts and time spent confirmed on benign windows are distinct outcomes.
 
-For report-ready findings, metric caveats and pending experiments, see [research findings](../RESEARCH_FINDINGS.md).
+For the completed study and metric caveats, see [extended results](../research/RESULTS.md) and [methodology](../METHODOLOGY.md).
 
 ## Primary test: train 1+2, validate 3, test 4
 

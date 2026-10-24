@@ -41,7 +41,7 @@ def main():
             labels[label[1]] = caption.split('.')[0]
         image = re.search(r'\\includegraphics\[[^]]+\]\{([^}]+)\}', block)
         if image:
-            replacement = f'![{caption}](assets/{image[1]})\n\n{caption}'
+            replacement = f'![{caption}](../../docs/research/{image[1]})\n\n{caption}'
         else:
             replacement = ('**System flow:** original captures → host feature extraction and RF training '
                            '→ validation-only confirmation selection → verified C++ export → Wokwi ESP32 '

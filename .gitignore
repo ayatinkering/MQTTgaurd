@@ -4,3 +4,5 @@ reports/
 __pycache__/
 *.py[cod]
 .venv/
+# Rebuildable original browser bundle; the current research demo is tracked separately.
+firmware/wokwi/

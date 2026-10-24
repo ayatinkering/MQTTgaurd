@@ -165,7 +165,7 @@ Capture 1 provides a useful nonzero false-alarm comparison at 83/84 covered runs
 
 The other folds remain in the saved audit. The original legacy clean-event results for k1/k2/k3 are 66/3/3,16/0/0,10/0/0 and 0/0/0 across captures 1–4. Audit version 2 additionally shows that capture 2 has two benign confirmed windows at k2 despite zero legacy clean false starts. These observations establish why onset suppression, false-state duration and coverage must be interpreted together. We do not pool the folds as independent sites or calculate confidence intervals by treating correlated windows as independent trials.
 
-![Measured capture 1 tradeoff at equal 83/84 coverage. Smaller occupancy and delay are preferable, while the table retains the separate onset count.](assets/matched_tradeoff.png)
+![Measured capture 1 tradeoff at equal 83/84 coverage. Smaller occupancy and delay are preferable, while the table retains the separate onset count.](../../docs/research/matched_tradeoff.png)
 
 Measured capture 1 tradeoff at equal 83/84 coverage. Smaller occupancy and delay are preferable, while the table retains the separate onset count.
 
@@ -197,7 +197,7 @@ All configurations' k2 rules cover 12/12 run proxies in this primary capture, ev
 | no_length | 0.7943 | 0.7143 | 0.7216 |
 | no_interarrival | 0.8851 | 0.8387 | 0.8357 |
 
-![Complete prespecified sensitivity grid. These additions use already inspected original captures and are exploratory.](assets/sensitivity.png)
+![Complete prespecified sensitivity grid. These additions use already inspected original captures and are exploratory.](../../docs/research/sensitivity.png)
 
 Complete prespecified sensitivity grid. These additions use already inspected original captures and are exploratory.
 

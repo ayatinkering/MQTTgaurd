@@ -91,4 +91,4 @@ Open `reports/dataset_preview.html` in a browser. It contains per-file summaries
 
 The data is suitable for investigating an offline binary MQTT classifier and temporal confirmation under explicitly stated rules. Inspection alone does not establish detection performance, attack-episode timing, embedded resource use, generalization, or novelty. Preserve other attacks and missing labels in audit/replay; exclude uncertain outputs from primary scoring with reasons rather than assigning them convenient labels.
 
-Follow [PRD.md](PRD.md) for the build sequence and [METHODOLOGY.md](METHODOLOGY.md) for fixed experimental definitions.
+Follow [METHODOLOGY.md](METHODOLOGY.md) for the build sequence, reproduction commands and experimental definitions.

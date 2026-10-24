@@ -1,7 +1,6 @@
 """Build the course LaTeX report from saved measured research artifacts."""
 import json
 from pathlib import Path
-import shutil
 
 ROOT=Path(__file__).resolve().parents[1]
 D=ROOT/'docs/research'
@@ -12,11 +11,9 @@ def tex(value):
 
 
 def main():
-    data=json.loads((D/'report_data.json').read_text())
-    output=ROOT/'deliverables/report';assets=output/'assets';assets.mkdir(exist_ok=True,parents=True)
-    for name in ['matched_tradeoff.png','sensitivity.png']:
-        shutil.copyfile(D/name,assets/name)
-    shutil.copyfile(ROOT/'docs/results/classification_metrics.png',assets/'classification_metrics.png')
+    data={'primary':[r for r in json.loads((D/'comparisons.json').read_text()) if r['split']=='primary'],
+          'sensitivity':json.loads((D/'sensitivity.json').read_text())}
+    output=ROOT/'deliverables/report';output.mkdir(exist_ok=True,parents=True)
     def policy_label(p):
         if p['family']=='consecutive':return f"k={p['k']}"
         return {'threshold':'Threshold','majority':'Majority','mean':'Moving mean','ewma':'EWMA','bounded_evidence':'Bounded evidence'}[p['family']]
@@ -38,7 +35,7 @@ def main():
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta}
 \usepackage[hidelinks]{hyperref}
-\graphicspath{{assets/}}
+\graphicspath{{../../docs/research/}}
 \title{MQTTGuard: Gap-Aware Confidence Confirmation for Embedded Detection of Slow MQTT Attacks}
 \author{\IEEEauthorblockN{Ayati Rauthan, Ireshi Rawat and Pranav Tawakley}
 \IEEEauthorblockA{Embedded System Design Lab\\Manipal Institute of Technology, Manipal, India}}

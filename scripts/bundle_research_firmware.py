@@ -3,6 +3,7 @@ from pathlib import Path
 import hashlib
 import json
 import shutil
+import runpy
 from train_pipeline import ROOT
 
 
@@ -33,17 +34,17 @@ def main():
             '\\"evidence\\":%.6f,\\"evidence_confirmed\\":%d,\\"evidence_events\\":%lu,\\"inference_us_simulated\\":%lu}')
     replace('(unsigned long)latest.inferenceUs);',
             'latest.evidenceValue,latest.evidenceActive,(unsigned long)latest.evidenceEvents,(unsigned long)latest.inferenceUs);')
-    (fw/'sketch.ino').write_text(sketch)
-    for name in ['mqttguard_model.h','replay_data.h','confirmation.h','libraries.txt']:
-        shutil.copyfile(source/name,fw/name)
     bundled=sketch
     for name in ['mqttguard_model.h','replay_data.h','confirmation.h','evidence_policy.h']:
-        bundled=bundled.replace('#include "'+name+'"','// '+name+'\n'+(fw/name).read_text().replace('#pragma once',''))
+        header=(fw if name=='evidence_policy.h' else source)/name
+        bundled=bundled.replace('#include "'+name+'"','// '+name+'\n'+header.read_text().replace('#pragma once',''))
     build=hashlib.sha256(bundled.encode()).hexdigest()[:16]
     bundled=bundled.replace('SOURCE_BUILD_ID',build)
     (out/'sketch.ino').write_text(bundled)
     (out/'build.json').write_text(json.dumps({'build_id':build,'sketch_sha256':hashlib.sha256(bundled.encode()).hexdigest(),'policy':policy},indent=2)+'\n')
     shutil.copyfile(source/'libraries.txt',out/'libraries.txt')
+    # Baseline browser files are reproducible build outputs, not a second checked-in demo.
+    runpy.run_path(str(ROOT/'scripts/bundle_firmware.py'),run_name='__main__')
     circuit=json.loads((ROOT/'firmware/wokwi/diagram.json').read_text())
     circuit['parts'] += [
         {'type':'wokwi-led','id':'evidenceLED','top':-70,'left':465,'attrs':{'color':'green','label':'BOUNDED EVIDENCE'}},

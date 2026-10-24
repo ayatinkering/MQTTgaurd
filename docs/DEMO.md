@@ -1,49 +1,39 @@
-# MQTTGuard demonstration guide
+# Run the current Wokwi demo
 
-## Before presenting
+Open [MQTTGuard Research on ESP32](https://wokwi.com/projects/478737844363875329) and press Start. To make your own copy, upload `sketch.ino`, `diagram.json` and `libraries.txt` from `firmware/wokwi_research/` together. The verified fingerprint is `3f718dc4c8d9ea81`.
 
-Open https://wokwi.com/projects/478675756306751489 . Keep the Wokwi tab visible while it runs. Open [RESULTS](results/RESULTS.md) alongside it. The saved project already contains the trained model and replay features; no local Python server or model API is required.
+The ESP32 runs the exported Random Forest on prerecorded feature windows and updates k=1/2/3 plus bounded evidence (h=0.75, decay=0.5). Orange/red/purple LEDs indicate k=1/2/3; green indicates bounded evidence. A buzzer signals a new k=2 event. Feature extraction and training occur on the host; MQTT status is an output, not incoming raw detector traffic.
 
-For independent MQTT reception, prepare the Python environment using the README. Start Wokwi, copy its printed `TOPIC=` value, then run:
+## Controls and serial output
+
+- **NEXT TRACE:** change between BENIGN, SLOWITE and GAP clips.
+- **PAUSE / PLAY:** pause or resume timed replay.
+- **AI / TEST:** switch actual model inference to explicitly scripted state tests.
+- Serial command `verify`: run complete clips automatically. `MODEL` lines report predictions/counters; paired `EVIDENCE` lines report evidence/state/events. `METRICS` reports simulator measurements.
+- `metrics`: print resource observations. The original firmware also supports controlled connection diagnostics with `selftest`, `fault` and `recover`; the saved fault evidence belongs to that original build.
+
+TEST mode bypasses the model and cannot demonstrate classification accuracy. Source labels never enter runtime decisions. Empty windows skip inference and clear confirmation; duplicates do not advance state. Short demo excerpts demonstrate execution; full captures supply research metrics.
+
+## Receive actual MQTT status
+
+Read the exact `TOPIC=` value from the serial monitor, then run:
 
 ```bash
-.venv/bin/python scripts/mqtt_status.py --topic 'mqttguard/PASTE_RUN_ID/status' --seconds 180
+.venv/bin/python scripts/mqtt_status.py --topic 'PASTE_TOPIC_HERE' --seconds 120 --output reports/demo_mqtt.jsonl
 ```
 
-Only normal demonstration status is published to a public test broker. If the broker is unavailable, show the still-running firmware/serial output and state that the connected portion needs retrying; do not claim successful reception without a received message.
+The firmware uses WiFi and a public broker via Wokwi's gateway. A separate FreeRTOS task owns the MQTT client; a one-record overwrite queue keeps retries from blocking inference. QoS-0/latest-state reporting is best-effort and does not guarantee every event is logged. Wokwi's public gateway cannot directly reach a broker running only on the laptop.
 
-## A three-to-five-minute presentation
+If communication fails, inspect serial connection messages, wait for retry and check the current topic rather than reusing an earlier boot's topic. Network availability does not determine the classifier's output. No live attack is generated against the public broker.
 
-1. **Explain the question:** a single suspicious classification may become a false alarm. Does waiting for repeated evidence improve alert reliability enough to justify delay?
-2. **Start in ACTUAL_MODEL mode:** the default SlowITe clip sends stored network-feature windows into the model executing on ESP32. Show serial prediction and probability. LEDs light for k=1, then k=2, then k=3 when consecutive positives occur.
-3. **Show an empty interval:** prediction -1 means unavailable, not normal; it resets the streak. The saved SlowITe clip contains both consecutive positives and empty gaps.
-4. **Show MQTT:** the independent subscriber displays the same run/window and confirmation states. Explain that MQTT carries computed results; broker messages do not supply the model's answers.
-5. **Press AI / TEST:** explicitly announce scripted verification mode. Isolated positives confirm only k=1; two/three consecutive positives activate the appropriate policies. Later tests include a missing source ID and duplicate ID; the duplicate is printed `accepted=0`.
-6. **Show research results:** primary k=2 preserves 12/12 observed-run detections but adds delay; primary k=1 already has zero clean false events. Use the separately labelled robustness table to show suppression/recall trade-offs elsewhere.
-7. **State limitations:** recorded-feature replay, one testbed/day, no live packet capture, no physical timing/power claims.
+## Verify the saved demonstration
 
-## Buttons and indicators
+After training and bundling, run:
 
-- NEXT TRACE: select the next validation excerpt, restart its counters.
-- PAUSE / PLAY: pause/resume; replay if the excerpt ended.
-- AI / TEST: toggle actual inference and scripted module verification.
-- Orange/red/purple LEDs: active confirmation at k=1/2/3.
-- Buzzer: short notification at a new k=2 event.
+```bash
+.venv/bin/python scripts/verify_research_target.py docs/evidence/research_wokwi_serial.txt
+```
 
-Each clip has 18 records, normally about 36 simulated seconds. They start at validation window IDs 0, 712 and 716; the SlowITe and gap clips overlap, so these are not independent evaluation sequences.
+The saved research observations have 62 paired rows and 53 independently received MQTT model-status records with zero prediction/state discrepancies. The minimum observed heap is 211,168 bytes; full image 928,912 bytes; evidence object 40 bytes. Median/p95 model-call timing is 140/147 simulated microseconds over 34 actual inference calls. Timing excludes preprocessing/network delivery and is not a physical ESP32 benchmark.
 
-For verification, enter `verify` in serial input to run every clip at 200-ms cadence. Enter `selftest` to show controlled connection failure/recovery at the normal cadence. `metrics` prints resource/timing observations. These diagnostic timings do not replace dataset event-time latency metrics. See [verified results](evidence/EMBEDDED_VERIFICATION.md).
-
-## Troubleshooting
-
-| Symptom | Action |
-| --- | --- |
-| Build waits in queue | Wait for the free build slot; do not buy a plan for this demo |
-| No messages in subscriber | Check `MQTT_CONNECTED`, exact topic, per-boot run ID, internet access and TCP port 1883 |
-| Topic changed after restart | Copy the new TOPIC line and restart the subscriber |
-| Browser controls appear to do nothing | Check simulation is running, then inspect the SCENARIO line; source pin names are DevKit-v1 specific |
-| Scenario ended | PAUSE / PLAY restarts it; NEXT chooses another |
-| Local source changed but website did not | Regenerate bundle, replace Wokwi files and save; there is no automatic sync |
-| Cannot edit someone else's saved project | Use a copy/fork under your account; record the new URL in status/docs |
-
-Do not replace recorded features with hardcoded attack labels to create a convenient AI demonstration. Scripted tests already provide a clearly labelled way to explain confirmation logic.
+See [evidence](evidence/README.md), [results](research/RESULTS.md) and [reproduction commands](METHODOLOGY.md). Regenerating a bundle does not upload it to Wokwi or produce new target evidence.
