@@ -55,7 +55,18 @@ def main():
                 writer.writerow({**{c:row.get(c) for c in columns if c not in ['study','policy','base_f1']},
                     'study':row.get('split',row.get('evaluation',study)),
                     'policy':json.dumps(row['policy'],sort_keys=True),'base_f1':row.get('base_classifier',{}).get('f1')})
+    immediate=next(r for r in f1 if r['policy']=={'family':'consecutive','k':1})
     lines=['# Completed extended MQTTGuard study','','All results are measured outputs of the saved protocol and metadata-driven external amendment. Original-data additions are exploratory because the original test outcomes were already inspected. The course report uses these definitions rather than silently mixing legacy and version-2 metrics.','',
+        '## Main report finding: consecutive confirmation','',
+        'The main research question is whether consecutive suspicious predictions reduce benign alarms while retaining observed SlowITe-run coverage at a measured delay cost. Confidence accumulation is a secondary extension. See the [final report-generation brief](../../deliverables/report/FINAL_REPORT_BRIEF.md) for the authoritative narrative, complete methodology and proof sources.','',
+        '| Capture-1 measure | Immediate k=1 | Two-window k=2 |',
+        '| --- | ---: | ---: |',
+        f"| Benign alarm starts | {immediate['benign_alarm_onsets']} | {a['benign_alarm_onsets']} |",
+        f"| Benign confirmed windows | {immediate['benign_confirmed_windows']} | {a['benign_confirmed_windows']} |",
+        f"| Benign alarm seconds | {immediate['benign_alarm_seconds']} | {a['benign_alarm_seconds']} |",
+        f"| Observed-run coverage | 84/84 | {a['covered_runs']}/{a['run_count']} |",
+        f"| Mean covered-run delay s, audit v2 | {n(immediate['coverage_delay_mean_s'])} | {n(a['coverage_delay_mean_s'])} |",'',
+        'Two-window confirmation reduces benign starts by 95.45% and benign alarm duration by 80.49%, with 98.81% observed-run coverage and approximately 2.10 seconds more conditional mean delay. This is the highlighted capture-1 result, not an overall effect across deployments or the separate 90.35%-accuracy reference classifier test. Excluded mixed/unknown/other starts remain separately recorded (484 versus 327). The older 0.925-second immediate delay is a legacy definition and is not used in this main comparison.','',
         '## Proposed extension and contribution','',
         'The bounded gap-aware evidence policy accumulates classifier confidence with a fixed scalar state and validation-only coverage-constrained calibration. This adapts established sequential evidence accumulation to the MQTT replay pipeline. Its contribution is the implemented decision-layer variant and complete evaluation; it does not establish a new general-purpose sequential detection principle.','',
         '## Primary alert comparison under audit version 2','',

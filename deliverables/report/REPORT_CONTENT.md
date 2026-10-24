@@ -1,3 +1,5 @@
+> **Final report framing:** Use [FINAL_REPORT_BRIEF.md](FINAL_REPORT_BRIEF.md) for the consecutive-confirmation main result and corrected audit values. The narrative below is an earlier extension-focused draft.
+
 # MQTTGuard: Gap-Aware Confidence Confirmation for Embedded Detection of Slow MQTT Attacks
 
 *Editable report content. Adapt the wording, author details and section lengths to your course template. Results below come from the completed repository experiments; numerical limitations are retained.*

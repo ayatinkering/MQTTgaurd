@@ -66,7 +66,8 @@ def main():
     text = re.sub(r'Table [A-Z][^.\n]+? (summarizes|gives|compares)', r'The table below \1', text)
     text = text.replace('Table Exploratory SlowITe F1 by feature set and window duration and Fig. Complete prespecified sensitivity grid retain', 'The sensitivity table and figure below retain')
     title = re.search(r'\\title\{([^}]+)\}', source)[1]
-    preface = ('# ' + title + '\n\n'
+    preface = ('> **Final report framing:** Use [FINAL_REPORT_BRIEF.md](FINAL_REPORT_BRIEF.md) for the consecutive-confirmation main result and corrected audit values. The narrative below is an earlier extension-focused draft.\n\n'
+               '# ' + title + '\n\n'
                '*Editable report content. Adapt the wording, author details and section lengths to your course template. '
                'Results below come from the completed repository experiments; numerical limitations are retained.*\n\n'
                'Authors: Ayati Rauthan, Ireshi Rawat and Pranav Tawakley.\n\n')

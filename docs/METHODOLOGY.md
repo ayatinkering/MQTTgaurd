@@ -1,6 +1,6 @@
 # Methodology and reproduction
 
-This is the implementation guide for the current project. For the paper narrative use [report content](../deliverables/report/REPORT_CONTENT.md); for measured tables use [extended results](research/RESULTS.md). Run all commands from the repository root after the setup in [README](../README.md).
+This is the implementation guide for the current project. For final paper framing and all report-generation facts use [the final report brief](../deliverables/report/FINAL_REPORT_BRIEF.md); for measured tables use [extended results](research/RESULTS.md). Run all commands from the repository root after the setup in [README](../README.md).
 
 ## Data and model
 

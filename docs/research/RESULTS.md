@@ -2,6 +2,20 @@
 
 All results are measured outputs of the saved protocol and metadata-driven external amendment. Original-data additions are exploratory because the original test outcomes were already inspected. The course report uses these definitions rather than silently mixing legacy and version-2 metrics.
 
+## Main report finding: consecutive confirmation
+
+The main research question is whether consecutive suspicious predictions reduce benign alarms while retaining observed SlowITe-run coverage at a measured delay cost. Confidence accumulation is a secondary extension. See the [final report-generation brief](../../deliverables/report/FINAL_REPORT_BRIEF.md) for the authoritative narrative, complete methodology and proof sources.
+
+| Capture-1 measure | Immediate k=1 | Two-window k=2 |
+| --- | ---: | ---: |
+| Benign alarm starts | 66 | 3 |
+| Benign confirmed windows | 82 | 16 |
+| Benign alarm seconds | 164 | 32 |
+| Observed-run coverage | 84/84 | 83/84 |
+| Mean covered-run delay s, audit v2 | 1.068 | 3.172 |
+
+Two-window confirmation reduces benign starts by 95.45% and benign alarm duration by 80.49%, with 98.81% observed-run coverage and approximately 2.10 seconds more conditional mean delay. This is the highlighted capture-1 result, not an overall effect across deployments or the separate 90.35%-accuracy reference classifier test. Excluded mixed/unknown/other starts remain separately recorded (484 versus 327). The older 0.925-second immediate delay is a legacy definition and is not used in this main comparison.
+
 ## Proposed extension and contribution
 
 The bounded gap-aware evidence policy accumulates classifier confidence with a fixed scalar state and validation-only coverage-constrained calibration. This adapts established sequential evidence accumulation to the MQTT replay pipeline. Its contribution is the implemented decision-layer variant and complete evaluation; it does not establish a new general-purpose sequential detection principle.
