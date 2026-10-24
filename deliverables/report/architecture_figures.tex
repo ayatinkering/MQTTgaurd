@@ -1,0 +1,97 @@
+% Requires tikz, float; TikZ libraries arrows.meta,positioning,calc.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=4.5mm,
+    block/.style={
+        draw,
+        rounded corners=1.5pt,
+        line width=0.65pt,
+        text width=6.6cm,
+        minimum height=8mm,
+        inner sep=4pt,
+        align=center,
+        font=\footnotesize
+    },
+    arrow/.style={
+        -{Stealth[length=2mm]},
+        line width=0.7pt
+    }
+]
+
+\node[block] (network) {
+    \textbf{MQTT-Based IoT Network}\\
+    Devices, publishers and broker
+};
+
+\node[block, below=of network] (traffic) {
+    \textbf{MQTT Traffic Observations}
+};
+
+\node[block, below=of traffic] (classification) {
+    \textbf{AI-Based Intrusion Detection}\\
+    Legitimate or suspicious
+};
+
+\node[block, below=of classification] (confirmation) {
+    \textbf{Persistence-Aware Confirmation}\\
+    Consecutive suspicious predictions: $k=1,2,3$
+};
+
+\node[block, below=of confirmation] (alarm) {
+    \textbf{Confirmed Intrusion Alarm}
+};
+
+\node[block, below=of alarm] (output) {
+    \textbf{Local Indicators and MQTT Status}
+};
+
+\draw[arrow] (network.south) -- (traffic.north);
+\draw[arrow] (traffic.south) -- (classification.north);
+\draw[arrow] (classification.south) -- (confirmation.north);
+\draw[arrow] (confirmation.south) -- (alarm.north);
+\draw[arrow] (alarm.south) -- (output.north);
+
+\end{tikzpicture}
+
+\caption{Conceptual intrusion-detection and
+alarm-confirmation flow. The implemented evaluation
+uses recorded MQTT traffic.}
+\label{fig:conceptual-flow}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=2.2mm,
+  block/.style={draw, rounded corners=1.5pt, line width=0.65pt,
+    text width=6.6cm, minimum height=5.8mm, inner sep=3pt,
+    align=center, font=\footnotesize},
+  branch/.style={block, text width=3.05cm, minimum height=8.5mm},
+  heading/.style={font=\footnotesize\bfseries, align=center},
+  arrow/.style={-{Stealth[length=2mm]}, line width=0.7pt}]
+\node[heading] (host) {HOST COMPUTER};
+\node[block, below=2.5mm of host] (capture) {Recorded MQTT Traffic Captures};
+\node[block, below=of capture] (verify) {Timestamp and Label Verification};
+\node[block, below=of verify] (windows) {Two-Second Traffic Windows\\Preserve Empty Intervals and Boundaries};
+\node[block, below=of windows] (features) {Extract Four Traffic Features};
+\node[block, below=of features] (train) {Train, Validate and Evaluate\\the Random Forest Classifier};
+\node[block, below=of train] (export) {Export Model and Recorded Features\\to ESP32 Firmware};
+\node[heading, below=5.5mm of export] (esp) {WOKWI-SIMULATED ESP32};
+\node[block, below=2.5mm of esp] (classify) {Classify Each Recorded Feature Window\\Using the Exported Random Forest};
+\node[block, below=of classify] (confirm) {Confirm Alarm After $k$ Consecutive\\Suspicious Predictions: $k=1,\ 2,\ \text{or}\ 3$};
+\coordinate (split) at ($(confirm.south)+(0,-4mm)$);
+\node[branch, anchor=north] (led) at ($(split)+(-1.85cm,-4mm)$) {LEDs and Buzzer\\Indicate Alarm State};
+\node[branch, anchor=north] (mqtt) at ($(split)+(1.85cm,-4mm)$) {Publish Alarm Status\\Through MQTT};
+\node[branch, below=4mm of mqtt] (python) {Python Subscriber\\Receives and Logs Status};
+\foreach \from/\to in {capture/verify,verify/windows,windows/features,features/train,train/export,classify/confirm,mqtt/python}
+  \draw[arrow] (\from.south) -- (\to.north);
+\draw[arrow] (export.south) -- ++(0,-5mm);
+\draw[line width=0.7pt] (confirm.south) -- (split);
+\draw[arrow] (split) -| (led.north);
+\draw[arrow] (split) -| (mqtt.north);
+\end{tikzpicture}
+\caption{Implemented host-computer and Wokwi-simulated ESP32 workflow using recorded traffic features. Training and feature extraction occur on the host; the ESP32 executes the exported classifier and confirmation rules.}
+\label{fig:implementation-workflow}
+\end{figure}

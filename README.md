@@ -2,7 +2,7 @@
 
 An Embedded Systems + AIoT course project: a compact Random Forest detects suspicious MQTT traffic, and an ESP32 simulated in Wokwi confirms alarms using consecutive predictions and bounded confidence evidence. The ESP32 runs actual C++ inference on prerecorded feature windows, drives LEDs/a buzzer and publishes computed status through MQTT.
 
-**[Open the current Wokwi demo](https://wokwi.com/projects/478737844363875329)** · **[Final report brief](deliverables/report/FINAL_REPORT_BRIEF.md)** · **[Results](docs/research/RESULTS.md)**
+**[Current report and figures](deliverables/report/README.md)** · **[Open the current Wokwi demo](https://wokwi.com/projects/478737844363875329)** · **[Final report brief](deliverables/report/FINAL_REPORT_BRIEF.md)** · **[Results](docs/research/RESULTS.md)**
 
 ## Start here
 
@@ -12,7 +12,8 @@ An Embedded Systems + AIoT course project: a compact Random Forest detects suspi
 | Understand/reproduce the ML and experiments | [Methodology and commands](docs/METHODOLOGY.md) |
 | Train in Colab | [Notebook](notebooks/MQTTGuard_ML_Colab.ipynb) and [version notes](docs/COLAB.md) |
 | Generate the final report | [Complete authoritative report brief](deliverables/report/FINAL_REPORT_BRIEF.md); supply it with your prescribed LaTeX template |
-| Consult the earlier narrative draft | [Editable content](deliverables/report/REPORT_CONTENT.md) and [LaTeX](deliverables/report/main.tex); final emphasis is defined by the brief |
+| Use the current report | [LaTeX and figures](deliverables/report/README.md), [plot notebook](deliverables/report/plots.ipynb), [table code](deliverables/report/tables.tex) |
+| Consult the earlier narrative draft | [Editable content](deliverables/report/REPORT_CONTENT.md); measured evidence remains in the final brief |
 | Inspect the data | [Dataset audit](docs/DATASET_REVIEW.md) and [hash manifest](docs/DATASET_MANIFEST.json) |
 | Check measured evidence | [Alarm audit CSV](docs/research/alarm_audit.csv) and [target verification](docs/evidence/README.md) |
 
@@ -46,6 +47,8 @@ Training creates `reports/experiment/model.joblib`, predictions and model/replay
 **Main question:** Can consecutive suspicious predictions reduce false alarms while retaining SlowITe-run coverage at a measured delay cost?
 
 On capture 1, two-window confirmation reduces benign alarm starts **66 → 3 (95.45%)** and benign alarm duration **164 → 32 seconds (80.49%)**, with **83/84 observed runs covered (98.81%)**. Conditional mean delay increases **1.068 → 3.172 seconds**, approximately **+2.10 seconds**, and one additional run is missed. The comparison uses identical classifier predictions. See the [final brief](deliverables/report/FINAL_REPORT_BRIEF.md) for the paper-ready result and evidence links.
+
+Three-window confirmation on capture 1 reduces benign duration to **26 seconds**, but covers **81/84** runs with **5.091 seconds** conditional mean delay. Main report comparisons retain all three k settings and all four captures.
 
 The separate reference classifier evaluation achieves **90.35% accuracy, 72.22% SlowITe recall and 83.87% F1** on 570 pure-class windows. Keep those results distinct from the capture-1 policy experiment.
 

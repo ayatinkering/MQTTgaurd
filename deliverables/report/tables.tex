@@ -1,0 +1,424 @@
+% Preamble packages match main.tex. Extracted from the current source.
+
+\begin{strip}
+\begingroup
+\centering
+
+\captionof{table}{Comparative Literature Survey}
+\label{tab:literature}
+\fontsize{6.0}{7.2}\selectfont
+\renewcommand{\arraystretch}{1.27}
+\setlength{\tabcolsep}{1.15pt}
+
+\begin{tabularx}{\textwidth}{|
+>{\RaggedRight\arraybackslash}p{2.05cm}|
+>{\RaggedRight\arraybackslash}X|
+>{\RaggedRight\arraybackslash}p{1.40cm}|
+>{\RaggedRight\arraybackslash}p{1.60cm}|
+>{\RaggedRight\arraybackslash}p{1.45cm}|
+>{\RaggedRight\arraybackslash}p{2.00cm}|
+>{\RaggedRight\arraybackslash}p{1.70cm}|
+>{\RaggedRight\arraybackslash}p{1.95cm}|
+>{\RaggedRight\arraybackslash}p{1.95cm}|}
+
+\hline
+
+\textbf{Paper} &
+\textbf{Problem} &
+\textbf{AI/ML Technique} &
+\textbf{IoT Architecture} &
+\textbf{Dataset} &
+\textbf{Methodology} &
+\textbf{Results} &
+\textbf{Advantages} &
+\textbf{Limitations}
+\\
+
+\hline
+
+% ==================================================
+% PAPER 1
+% ==================================================
+
+\textbf{Capturing Low-Rate DDoS Attack Based on MQTT Protocol in
+Software Defined-IoT Environment (2023)}~\cite{alfayoumi2023}
+&
+Low-rate MQTT attacks can resemble legitimate traffic and evade
+conventional traffic-based detection.
+&
+DT, MLP, ANN, Naive Bayes.
+&
+MQTT-based Software Defined IoT with centralized SDN control.
+&
+\seqsplit{LRDDoS-MQTT-2022}
+&
+Uses selected traffic features to compare four ML models for low-rate
+attack detection.
+&
+DT achieved \textbf{99.5\% accuracy} with the highest detection speed.
+&
+Directly addresses low-rate MQTT attacks using lightweight ML.
+&
+Focuses on classification rather than persistence across successive
+predictions and final alert confirmation.
+\\
+
+\hline
+
+% ==================================================
+% PAPER 2
+% ==================================================
+
+\textbf{Towards Resource Efficient DDoS Detection in IoT:
+Leveraging Feature Engineering of System and Network Usage Metrics
+(2024)}~\cite{gavric2024}
+&
+Packet-level inspection can impose excessive computation on
+resource-constrained IoT devices.
+&
+RF, DT, KNN, SVM, DNN.
+&
+IoT devices connected wirelessly to an IoT sink with local detection.
+&
+Custom IoT DoS dataset.
+&
+Generates compact system/network features periodically and performs
+ML inference once per interval.
+&
+Detected tested attacks with \textbf{over 99.9\% accuracy} and low
+constant computational complexity.
+&
+Demonstrates resource-efficient interval-based inference.
+&
+Does not investigate persistence-based MQTT alert confirmation.
+\\
+
+\hline
+
+% ==================================================
+% PAPER 3
+% ==================================================
+
+\textbf{Enhancing MQTT Intrusion Detection in IoT Using Machine
+Learning and Feature Engineering (2025)}~\cite{putro2025}
+&
+Detection performance depends strongly on selected traffic features
+and ML models.
+&
+RF, DT, k-NN, XGBoost, LR, SGD, NB.
+&
+MQTT-based IoT network with ML traffic monitoring.
+&
+RT-IoT2022.
+&
+Performs feature selection and evaluates seven ML classifiers.
+&
+k-NN achieved \textbf{98.90\% accuracy} and \textbf{99.39\% F1}.
+&
+Demonstrates the importance of feature engineering and FPR reduction.
+&
+Evaluates individual classifications rather than successive
+classifications and final alerts.
+\\
+
+\hline
+
+% ==================================================
+% PAPER 4
+% ==================================================
+
+\textbf{On Detection Latencies of Network Intrusion Detectors:
+Discussion and Application (2026)}~\cite{puccetti2026}
+&
+Classification metrics alone do not capture how long attacks remain
+undetected.
+&
+IDS evaluation framework.
+&
+Includes IIoT and MQTT systems.
+&
+Multiple datasets.
+&
+Evaluates detector correctness together with time to detection.
+&
+Shows that \textbf{detection latency} provides information beyond
+precision, recall, and FPR.
+&
+Supports evaluation of the false-alert versus detection-delay
+trade-off.
+&
+Does not propose a lightweight persistence-based MQTT confirmation
+mechanism.
+\\
+
+\hline
+
+% ==================================================
+% PAPER 5
+% ==================================================
+
+\textbf{DoS/DDoS-MQTT-IoT: A Dataset for Evaluating Intrusions in
+IoT Networks Using the MQTT Protocol (2023)}~\cite{alatram2023}
+&
+Lack of realistic MQTT datasets containing normal traffic and multiple
+DoS/DDoS scenarios.
+&
+DT, k-NN, SVM, LR, NB, RF, XGBoost, ANN.
+&
+Physical sensors, Raspberry Pi publishers, MQTT broker, subscribers,
+and attacker machines.
+&
+\seqsplit{DoS/DDoS-MQTT-IoT}
+&
+Captures normal MQTT traffic and ten attack scenarios using a physical
+IoT testbed.
+&
+All scenarios were successfully captured; RF and XGBoost performed
+best during dataset validation.
+&
+Provides realistic MQTT traffic and multiple flooding variants.
+&
+Primarily a dataset and classification study rather than temporal
+alert confirmation.
+\\
+
+\hline
+
+\end{tabularx}
+\endgroup
+\end{strip}
+
+\begin{table}[t]
+\centering
+\caption{Label composition of the four original MQTTEEB-D captures.}
+\label{tab:data}
+\begin{tabular}{lr}
+\toprule
+Source label & Observations \\
+\midrule
+Legitimate & 17,557 \\
+SlowITe & 20,090 \\
+DoS & 41,802 \\
+Malformed & 105,528 \\
+Brute force & 27,377 \\
+Flood & 10,213 \\
+Missing label & 246 \\
+Total & 222,813 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Traffic features extracted from each valid window.}
+\label{tab:features}
+\begin{tabularx}{\columnwidth}{lX}
+\toprule
+Feature & Definition \\
+\midrule
+Count & Number of traffic observations in the window. \\
+Mean TCP length & Mean recorded TCP payload length. \\
+Mean interarrival & Mean gap between consecutive within-window timestamps; missing for a singleton. \\
+Mean keepalive & Mean recorded MQTT keepalive metadata. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table*}[t]
+\centering
+\caption{Capture-separated experimental partitions.}
+\label{tab:splits}
+\begin{tabularx}{\textwidth}{Xccc}
+\toprule
+Evaluation & Training captures & Validation capture & Test capture \\
+\midrule
+Main / robustness capture 1 & 3+4 & 2 & 1 \\
+Robustness capture 2 & 1+4 & 3 & 2 \\
+Robustness capture 3 & 1+2 & 4 & 3 \\
+Robustness capture 4 & 2+3 & 1 & 4 \\
+Reference / exported model & 1+2 & 3 & 4 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{table}[t]
+\centering
+\caption{Capture-1 test: identical RF predictions, different confirmation policies.}
+\label{tab:main}
+\begin{tabularx}{\columnwidth}{Xrrr}
+\toprule
+Metric & $k=1$ & $k=2$ & $k=3$ \\
+\midrule
+Benign alarm starts & 66 & 3 & 4 \\
+Benign confirmed windows & 82 & 16 & 13 \\
+Benign alarm duration (s) & 164 & 32 & 26 \\
+Observed-run coverage & 84/84 & 83/84 & 81/84 \\
+Missed observed runs & 0 & 1 & 3 \\
+Mean detection delay (s) & 1.068 & 3.172 & 5.091 \\
+Median delay (s) & 1.022 & 3.063 & 4.981 \\
+95th-percentile delay (s) & 2.146 & 6.118 & 5.981 \\
+Excluded starts & 484 & 327 & 274 \\
+\bottomrule
+\end{tabularx}
+\smallskip
+\parbox{\columnwidth}{\footnotesize Delays are conditional on covered observed runs. Excluded starts occur on mixed, unknown or other-class windows and are not counted as benign or correct detections.}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Window classification in two separately fitted evaluations.}
+\label{tab:classification}
+\begin{tabularx}{\columnwidth}{Xrr}
+\toprule
+Metric & Capture-1 RF & Reference RF \\
+\midrule
+Accuracy & 90.72\% & 90.35\% \\
+SlowITe precision & 91.91\% & 100.00\% \\
+SlowITe recall & 83.44\% & 72.22\% \\
+SlowITe F1 & 87.47\% & 83.87\% \\
+Scored windows & 2,876 & 570 \\
+\bottomrule
+\end{tabularx}
+\smallskip
+\parbox{\columnwidth}{\footnotesize Confirmation policies operate after classification; these scores are not separate k=1, k=2 or k=3 classifier accuracies.}
+\end{table}
+
+\begin{table*}[t]
+\centering
+\caption{Confirmation policies for the reference exported model.}
+\label{tab:reference_policy}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}Xrrrr}
+\toprule
+Policy & Benign starts & Benign seconds & Runs covered & Mean delay (s) \\
+\midrule
+$k=1$ & 0 & 0 & 12/12 & 1.055 \\
+$k=2$ & 0 & 0 & 12/12 & 3.555 \\
+$k=3$ & 0 & 0 & 10/12 & 4.900 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{Consecutive confirmation across capture-separated robustness evaluations.}
+\label{tab:robustness}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}Xrrrrrr}
+\toprule
+\shortstack{Test\\capture} & $k$ & \shortstack{Benign\\starts} & \shortstack{Benign\\duration (s)} & \shortstack{Runs\\covered} & Misses & \shortstack{Mean delay\\(s)} \\
+\midrule
+1 & 1 & 66 & 164 & 84/84 & 0 & 1.068 \\
+1 & 2 & 3 & 32 & 83/84 & 1 & 3.172 \\
+1 & 3 & 4 & 26 & 81/84 & 3 & 5.091 \\
+2 & 1 & 16 & 36 & 24/24 & 0 & 1.165 \\
+2 & 2 & 1 & 4 & 24/24 & 0 & 3.332 \\
+2 & 3 & 0 & 2 & 23/24 & 1 & 5.184 \\
+3 & 1 & 10 & 28 & 12/12 & 0 & 0.841 \\
+3 & 2 & 3 & 8 & 12/12 & 0 & 3.175 \\
+3 & 3 & 1 & 2 & 12/12 & 0 & 5.675 \\
+4 & 1 & 0 & 0 & 12/12 & 0 & 1.055 \\
+4 & 2 & 0 & 0 & 12/12 & 0 & 3.555 \\
+4 & 3 & 0 & 0 & 10/12 & 2 & 4.947 \\
+\bottomrule
+\end{tabularx}
+\smallskip
+\parbox{\textwidth}{\footnotesize Each fold is fitted separately. The capture-4 robustness model differs from the reference model, which explains its slightly different k=3 mean delay.}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{Capture-1 alternatives evaluated on identical RF scores.}
+\label{tab:alternatives}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}Xrrrr}
+\toprule
+Policy & Benign starts & Benign seconds & Runs covered & Mean delay (s) \\
+\midrule
+Consecutive $k=1$ & 66 & 164 & 84/84 & 1.068 \\
+Consecutive $k=2$ & 3 & 32 & 83/84 & 3.172 \\
+Consecutive $k=3$ & 4 & 26 & 81/84 & 5.091 \\
+Threshold 0.99 & 5 & 10 & 83/84 & 3.001 \\
+Majority, width 3 & 9 & 92 & 84/84 & 4.711 \\
+Mean, width 3, threshold 0.8 & 0 & 8 & 81/84 & 4.992 \\
+EWMA, $\alpha=0.75$, threshold 0.9 & 34 & 72 & 84/84 & 1.401 \\
+Bounded evidence, $h=0.5$, $d=0.5$ & 5 & 18 & 83/84 & 2.690 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{Supplementary MQTTset DoS scenario: frozen transfer and separate adaptation.}
+\label{tab:external}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}Xrrr}
+\toprule
+Model & $k$ & Scenario coverage & Mean delay (s) \\
+\midrule
+Frozen reference & 1 & 1/1 & 28.000 \\
+Frozen reference & 2 & 0/1 & -- \\
+Frozen reference & 3 & 0/1 & -- \\
+Separately adapted & 1 & 1/1 & 3.400 \\
+Separately adapted & 2 & 1/1 & 5.400 \\
+Separately adapted & 3 & 1/1 & 7.400 \\
+\bottomrule
+\end{tabularx}
+\smallskip
+\parbox{\textwidth}{\footnotesize No delay is defined for a missed scenario. Adapted-model delays are measured from the retained test-segment boundary; they do not share the frozen full-scenario time origin.}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{Legitimate aggregate workload: confirmation under behavioural changes.}
+\label{tab:benign_stress}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}Xrrr}
+\toprule
+Model & $k$ & Benign starts & Confirmed windows \\
+\midrule
+Frozen reference & 1 & 0 & 0/60 \\
+Frozen reference & 2 & 0 & 0/60 \\
+Frozen reference & 3 & 0 & 0/60 \\
+Separately adapted & 1 & 1 & 1/60 \\
+Separately adapted & 2 & 0 & 0/60 \\
+Separately adapted & 3 & 0 & 0/60 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{table}[t]
+\centering
+\caption{Exploratory SlowITe F1 for feature sets and window durations.}
+\label{tab:sensitivity}
+\begin{tabular}{lrrr}
+\toprule
+Feature set & 1 s & 2 s & 5 s \\
+\midrule
+All four & 0.8830 & 0.8387 & 0.4026 \\
+No keepalive & 0.8893 & 0.8455 & 0.4054 \\
+Count and length & 0.8851 & 0.5118 & 0.3993 \\
+No count & 0.8830 & 0.8421 & 0.8357 \\
+No length & 0.7943 & 0.7143 & 0.7216 \\
+No interarrival & 0.8851 & 0.8387 & 0.8357 \\
+\bottomrule
+\end{tabular}
+\smallskip
+\parbox{\columnwidth}{\footnotesize Window duration changes the scored pure-window cohort. These are not paired predictions on an identical set of examples.}
+\end{table}
+
+\begin{table*}[t]
+\centering
+\caption{Retained embedded numerical-consistency and simulated-execution verification.}
+\label{tab:embedded}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+Verification item & Observed result \\
+\midrule
+Python/C++ RF comparison & 11,210 tested inputs, including 321 threshold-boundary cases; zero label disagreements. \\
+C++ evidence-policy comparison & 2,721,252 score-policy transitions; zero state/event discrepancies. \\
+Verified Wokwi observations & 62 paired model/evidence rows, including 34 actual classifier calls. \\
+Independent MQTT reception & 53 checked status records; zero prediction or confirmation-state discrepancies. \\
+Automated checks & 20 passing tests. \\
+Full firmware image & 928,912 bytes; includes application and runtime. \\
+Minimum observed free heap & 211,168 bytes. \\
+Evidence-policy object & 40 bytes; not the complete RF or firmware footprint. \\
+Model-call timing & Median 140 and p95 147 simulated microseconds over 34 calls; excludes preprocessing and networking. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
